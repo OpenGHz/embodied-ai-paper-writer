@@ -1,5 +1,7 @@
 # Embodied AI Paper Writer
 
+English | [简体中文](README.zh-CN.md)
+
 > A Claude Skill that coaches the **writing craft** of embodied-AI papers — distilled from 63 top-conference papers across CoRL, RSS, ICRA, IROS, and Science Robotics (2022–2026).
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
