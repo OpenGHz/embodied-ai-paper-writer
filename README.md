@@ -2,10 +2,10 @@
 
 English | [简体中文](README.zh-CN.md)
 
-> A Claude Skill that coaches the **writing craft** of embodied-AI papers — distilled from 63 top-conference papers across CoRL, RSS, ICRA, IROS, and Science Robotics (2022–2026).
+> A portable agent skill (SKILL.md + reference playbooks) that coaches the **writing craft** of embodied-AI papers — distilled from 63 top-conference papers across CoRL, RSS, ICRA, IROS, and Science Robotics (2022–2026). Works with any LLM agent that can load markdown context.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Skill format: Claude Skill](https://img.shields.io/badge/format-Claude%20Skill-blue.svg)](SKILL.md)
+[![Format: SKILL.md](https://img.shields.io/badge/format-SKILL.md-blue.svg)](SKILL.md)
 [![Corpus: 63 papers](https://img.shields.io/badge/corpus-63%20papers-green.svg)](references/research/_paper_roster.md)
 [![Venues: CoRL · RSS · ICRA · IROS · Sci. Robotics](https://img.shields.io/badge/venues-CoRL%20%C2%B7%20RSS%20%C2%B7%20ICRA%20%C2%B7%20IROS%20%C2%B7%20Sci.%20Robotics-purple.svg)](references/research/_paper_roster.md)
 
@@ -13,7 +13,7 @@ English | [简体中文](README.zh-CN.md)
 
 ## What this is
 
-A drop-in **Claude Skill** that turns Claude into a corpus-tuned coach for writing robotics / embodied-AI papers. It teaches:
+A drop-in **agent skill** that turns any modern LLM agent — Claude Code, Cursor, Continue, Cline, Aider, the Anthropic / OpenAI SDKs, or anything else that can load a system prompt — into a corpus-tuned coach for writing robotics / embodied-AI papers. It teaches:
 
 - Title patterns, abstract moves, intro arcs.
 - Method / Related Work organization.
@@ -39,24 +39,28 @@ Each rule traces back to observed patterns in the 63-paper corpus.
 
 ## Quick start
 
-### 1. Install as a Claude Skill
+### 1. Install
 
-Copy [`SKILL.md`](SKILL.md) and [`references/`](references/) into your Claude Skill directory. Typical locations:
+Copy [`SKILL.md`](SKILL.md) and [`references/`](references/) into wherever your agent loads system prompts or skill files. Examples:
 
-- **Claude Code**: `~/.claude/skills/embodied-ai-paper-writer/`
-- **Project-local**: `<your-project>/.claude/skills/embodied-ai-paper-writer/`
-- **Claude Agent SDK**: configure via your agent definition.
+- **Claude Code** — user-level: `~/.claude/skills/embodied-ai-paper-writer/`
+- **Claude Code** — project-level: `<your-project>/.claude/skills/embodied-ai-paper-writer/`
+- **Cursor / Continue / Cline / Aider** — paste `SKILL.md` into the custom-rules / system-prompt panel; keep `references/` next to it and attach files on demand per the routing table.
+- **Custom agent (Anthropic / OpenAI / local model SDKs)** — load `SKILL.md` as the system message; lazily read `references/*.md` based on the routing table.
+- **Plain chat** — paste `SKILL.md` into the conversation; follow up with the relevant playbook when the routing table calls for it.
 
 ```bash
-# Example: install as user-level skill for Claude Code
+# Example: install as a user-level skill for Claude Code
 SKILL_DIR="$HOME/.claude/skills/embodied-ai-paper-writer"
 mkdir -p "$SKILL_DIR"
 cp -r SKILL.md references "$SKILL_DIR/"
 ```
 
+The skill is just markdown + frontmatter — nothing in the runtime behavior is locked to one vendor.
+
 ### 2. Invoke it
 
-Once installed, Claude auto-activates on phrases like:
+Once loaded, the agent will engage on phrases like:
 
 - "Help me write the abstract for my CoRL submission."
 - "Caption this figure — it's a 3-panel success-rate plot."
@@ -97,7 +101,7 @@ The skill has two layers:
 
 | Layer | Files | Purpose |
 |---|---|---|
-| **Operational** | `SKILL.md` + 8 playbooks in `references/*.md` | Loaded by Claude on demand via the routing table in SKILL.md |
+| **Operational** | `SKILL.md` + 8 playbooks in `references/*.md` | Loaded by the agent on demand via the routing table in SKILL.md |
 | **Research** | 9 files in `references/research/` | Raw evidence — read only when traceability is needed |
 
 The operational playbooks are 8–25 KB each. The research files (50–200 KB) exist so any rule can be traced back to source patterns; they are **not** loaded during normal use.
@@ -144,6 +148,6 @@ If this skill helped your writing, please cite the repository. See [`CITATION.cf
 
 ## Acknowledgments
 
-This skill was distilled using the [Nuwa · Skill造人术](https://github.com/alchaincyf/nuwa-skill) methodology — a structured pipeline for turning expert corpora into operational Claude Skills. The methodology made the difference between "generic writing advice" and "corpus-tuned quantified rules."
+This skill was distilled using the [Nuwa · Skill造人术](https://github.com/alchaincyf/nuwa-skill) methodology — a structured pipeline for turning expert corpora into operational skills (SKILL.md + reference layer). The methodology made the difference between "generic writing advice" and "corpus-tuned quantified rules."
 
 Original corpus papers and authors retain all rights to their work; only writing patterns and conventions are abstracted here.

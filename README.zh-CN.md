@@ -2,10 +2,10 @@
 
 [English](README.md) | 简体中文
 
-> 一个 Claude Skill，专门指导具身智能（Embodied AI）论文的**写作技艺**——从 2022–2026 年 CoRL、RSS、ICRA、IROS、Science Robotics 五大顶会的 63 篇论文中提炼而来。
+> 一个可移植的 agent 技能（SKILL.md + 参考手册），专门指导具身智能（Embodied AI）论文的**写作技艺**——从 2022–2026 年 CoRL、RSS、ICRA、IROS、Science Robotics 五大顶会的 63 篇论文中提炼而来。可被任何能加载 markdown 上下文的 LLM agent 使用。
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Skill format: Claude Skill](https://img.shields.io/badge/format-Claude%20Skill-blue.svg)](SKILL.md)
+[![Format: SKILL.md](https://img.shields.io/badge/format-SKILL.md-blue.svg)](SKILL.md)
 [![Corpus: 63 papers](https://img.shields.io/badge/corpus-63%20papers-green.svg)](references/research/_paper_roster.md)
 [![Venues: CoRL · RSS · ICRA · IROS · Sci. Robotics](https://img.shields.io/badge/venues-CoRL%20%C2%B7%20RSS%20%C2%B7%20ICRA%20%C2%B7%20IROS%20%C2%B7%20Sci.%20Robotics-purple.svg)](references/research/_paper_roster.md)
 
@@ -13,7 +13,7 @@
 
 ## 这是什么
 
-一个开箱即用的 **Claude Skill**，把 Claude 变成一位面向机器人 / 具身智能论文写作、基于语料调优的写作教练。它教你：
+一个开箱即用的 **agent 技能**，把任何现代 LLM agent —— Claude Code、Cursor、Continue、Cline、Aider、Anthropic / OpenAI SDK，或任何能加载 system prompt 的工具 —— 变成一位针对机器人 / 具身智能论文写作、基于语料调优的写作教练。它教你：
 
 - 标题范式、摘要章法、引言弧线。
 - 方法 / 相关工作的组织方式。
@@ -39,24 +39,28 @@
 
 ## 快速上手
 
-### 1. 作为 Claude Skill 安装
+### 1. 安装
 
-把 [`SKILL.md`](SKILL.md) 和 [`references/`](references/) 复制到你的 Claude Skill 目录。常见位置：
+把 [`SKILL.md`](SKILL.md) 和 [`references/`](references/) 复制到你的 agent 加载 system prompt 或 skill 文件的位置。常见目标：
 
-- **Claude Code**：`~/.claude/skills/embodied-ai-paper-writer/`
-- **项目级**：`<your-project>/.claude/skills/embodied-ai-paper-writer/`
-- **Claude Agent SDK**：在你的 agent 定义中配置。
+- **Claude Code** —— 用户级：`~/.claude/skills/embodied-ai-paper-writer/`
+- **Claude Code** —— 项目级：`<your-project>/.claude/skills/embodied-ai-paper-writer/`
+- **Cursor / Continue / Cline / Aider** —— 把 `SKILL.md` 贴进 custom rules / system prompt 面板，`references/` 放在旁边，按 routing 表按需附加。
+- **自定义 agent（Anthropic / OpenAI / 本地模型 SDK）** —— 把 `SKILL.md` 作为 system message 加载，按 routing 表懒加载 `references/*.md`。
+- **纯聊天** —— 把 `SKILL.md` 贴进对话，按 routing 表的提示再补充对应 playbook。
 
 ```bash
-# 示例：作为用户级 skill 安装到 Claude Code
+# 示例：作为用户级 skill 装到 Claude Code
 SKILL_DIR="$HOME/.claude/skills/embodied-ai-paper-writer"
 mkdir -p "$SKILL_DIR"
 cp -r SKILL.md references "$SKILL_DIR/"
 ```
 
+这个 skill 就是 markdown + frontmatter，运行时行为没有任何东西绑死在某一家厂商上。
+
 ### 2. 唤起它
 
-安装完之后，Claude 会在以下这类提问中自动激活：
+加载好之后，agent 会在以下这类提问中开始工作：
 
 - "Help me write the abstract for my CoRL submission."
 - "Caption this figure — it's a 3-panel success-rate plot."
@@ -97,7 +101,7 @@ embodied-ai-paper-writer/
 
 | 层级 | 文件 | 用途 |
 |---|---|---|
-| **操作层** | `SKILL.md` + `references/*.md` 里的 8 个 playbook | 由 Claude 通过 SKILL.md 中的路由表按需加载 |
+| **操作层** | `SKILL.md` + `references/*.md` 里的 8 个 playbook | 由 agent 通过 SKILL.md 中的路由表按需加载 |
 | **研究层** | `references/research/` 下的 9 个文件 | 原始证据——仅在需要追溯时阅读 |
 
 操作层的 playbook 每个 8–25 KB。研究层文件（50–200 KB）的作用是让任意一条规则都能追溯回源头规律，**正常使用时不会被加载**。
@@ -144,6 +148,6 @@ agent 遵循五种执行场景（在 [`SKILL.md`](SKILL.md) 中定义）：
 
 ## 致谢
 
-本 skill 使用 [Nuwa · Skill造人术](https://github.com/alchaincyf/nuwa-skill) 方法论提炼而成——这是一套把专家语料转化为可操作 Claude Skill 的结构化流水线。这套方法论是"泛泛的写作建议"和"基于语料调优的量化规则"之间的分水岭。
+本 skill 使用 [Nuwa · Skill造人术](https://github.com/alchaincyf/nuwa-skill) 方法论提炼而成——这是一套把专家语料转化为可操作 skill（SKILL.md + 参考层）的结构化流水线。这套方法论是"泛泛的写作建议"和"基于语料调优的量化规则"之间的分水岭。
 
 语料库中的原始论文及作者保留其全部权益；本仓库仅抽取写作范式与惯例。

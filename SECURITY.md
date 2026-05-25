@@ -2,7 +2,7 @@
 
 ## Scope
 
-This repository contains documentation and prompt content (a Claude Skill). It does not ship executable code, network services, or compiled binaries. The realistic security surface is small but not zero — for example, malicious patterns added to the skill could mislead authors, and corpus content could plagiarize without attribution.
+This repository contains documentation and prompt content (an agent skill — SKILL.md + reference playbooks). It does not ship executable code, network services, or compiled binaries. The realistic security surface is small but not zero — for example, malicious patterns added to the skill could mislead authors, and corpus content could plagiarize without attribution.
 
 ## Supported versions
 
