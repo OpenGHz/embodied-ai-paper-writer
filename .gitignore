@@ -1,0 +1,29 @@
+# OS / editor / scratch
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Local Claude / agent state (not part of the skill itself)
+.claude/
+.anthropic/
+
+# Logs and temp
+*.log
+.tmp/
+.cache/
+
+# Python / Node scratch (in case contributors run helper scripts)
+__pycache__/
+*.pyc
+.venv/
+venv/
+node_modules/
+
+# Local-only drafts kept outside the playbook canon
+drafts/
+scratch/
+NOTES.local.md

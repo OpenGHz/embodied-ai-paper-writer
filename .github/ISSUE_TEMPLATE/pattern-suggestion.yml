@@ -1,0 +1,48 @@
+name: Pattern Suggestion — missing move, opener, or anti-pattern
+description: Suggest a new writing pattern, opener, transition, or anti-pattern to add to a playbook.
+title: "[Pattern] "
+labels: ["enhancement", "pattern", "needs-triage"]
+body:
+  - type: input
+    id: target-playbook
+    attributes:
+      label: Which playbook does this belong in?
+      description: Pick the most natural home (titles / abstract-intro / method-relatedwork / experiments-results / figures-tables / language-phrasebank / flow-transitions / closing-appendix).
+      placeholder: "flow-transitions.md"
+    validations:
+      required: true
+  - type: dropdown
+    id: pattern-type
+    attributes:
+      label: Pattern type
+      options:
+        - Positive pattern (recommended)
+        - Anti-pattern (avoid)
+        - Convention (venue-specific)
+    validations:
+      required: true
+  - type: textarea
+    id: pattern-description
+    attributes:
+      label: The pattern
+      description: Describe it in 2–4 sentences. Be specific about when it applies.
+    validations:
+      required: true
+  - type: textarea
+    id: corpus-examples
+    attributes:
+      label: Corpus examples
+      description: "List 3+ papers that use this pattern (venue + year + arXiv ID). For each, quote the relevant sentence/paragraph."
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-step
+    attributes:
+      label: Proposed Step text (optional)
+      description: Draft of the Step / rule as you'd like it to appear in the playbook.
+    validations:
+      required: false

@@ -1,0 +1,64 @@
+name: Paper Addition — add a paper to the corpus
+description: Propose a paper to add to the 63-paper corpus.
+title: "[Paper] "
+labels: ["corpus", "enhancement", "needs-triage"]
+body:
+  - type: input
+    id: paper-title
+    attributes:
+      label: Paper title
+    validations:
+      required: true
+  - type: input
+    id: arxiv-id
+    attributes:
+      label: arXiv ID (or DOI)
+      placeholder: "2406.09246"
+    validations:
+      required: true
+  - type: dropdown
+    id: venue
+    attributes:
+      label: Venue
+      options:
+        - CoRL
+        - RSS
+        - ICRA
+        - IROS
+        - Science Robotics
+        - Other (specify in notes)
+    validations:
+      required: true
+  - type: input
+    id: year
+    attributes:
+      label: Year
+      placeholder: "2024"
+    validations:
+      required: true
+  - type: dropdown
+    id: award
+    attributes:
+      label: Award / recognition (if any)
+      options:
+        - None
+        - Best Paper
+        - Best Paper Finalist
+        - Best Student Paper
+        - Best Systems Paper
+        - Other (specify in notes)
+    validations:
+      required: false
+  - type: textarea
+    id: convention-of-interest
+    attributes:
+      label: What writing convention does this paper exemplify or break?
+      description: One-paragraph note. This is what makes the paper worth adding — a representative example, a counter-example, or a novel pattern.
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: Additional notes
+    validations:
+      required: false

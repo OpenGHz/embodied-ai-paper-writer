@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Question or discussion
+    url: https://github.com/OpenGHz/embodied-ai-paper-writer/discussions
+    about: For design questions, "how do I use this for venue X", or anything not yet a bug or proposal.
+  - name: Security concern
+    url: https://github.com/OpenGHz/embodied-ai-paper-writer/security/advisories/new
+    about: Report privately. See SECURITY.md for scope.

@@ -1,0 +1,50 @@
+name: Bug Report — rule is wrong or contradicted by the corpus
+description: A specific rule in SKILL.md or references/*.md contradicts what is observed in published papers.
+title: "[Bug] "
+labels: ["bug", "needs-triage"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for filing a bug. **Rules in this skill should be grounded in observed paper patterns**, so the most useful bug reports cite at least 2 counter-examples.
+  - type: input
+    id: rule-location
+    attributes:
+      label: Where is the rule?
+      description: File and step/section (e.g., `figures-tables-playbook.md` Step 7).
+      placeholder: "references/figures-tables-playbook.md Step 7"
+    validations:
+      required: true
+  - type: textarea
+    id: rule-quote
+    attributes:
+      label: Quote the rule
+      description: Paste the exact text of the rule you think is wrong.
+    validations:
+      required: true
+  - type: textarea
+    id: counter-evidence
+    attributes:
+      label: Counter-examples from the corpus
+      description: "List at least 2 papers (venue + year + arXiv ID) that contradict this rule. Quote the relevant sentences/figures."
+      placeholder: |
+        1. OpenVLA (CoRL 2024, arXiv:2406.09246) — its Figure 4 caption does X instead of Y.
+        2. Mobile ALOHA (CoRL 2024, arXiv:2401.02117) — same pattern in Figure 5.
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-rule
+    attributes:
+      label: Proposed correction
+      description: What should the rule say instead? Be specific.
+    validations:
+      required: false
+  - type: checkboxes
+    id: confirm
+    attributes:
+      label: Confirmation
+      options:
+        - label: I have searched existing issues and PRs and this isn't a duplicate.
+          required: true
+        - label: I have cited at least 2 counter-examples (not just my opinion).
+          required: true
