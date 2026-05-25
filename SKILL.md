@@ -237,7 +237,7 @@ Step 2: Read each drafted section through 4 lenses
   → Tense correctness: Abstract present, Conclusion past?
   → Figure/table coupling: are all main-text figures referenced?
 
-Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + 17 + standing rules)
+Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + 17 + 18 + 19 + standing rules)
   → Abstract self-containment: grep abstract for `\ref`, `\autoref`, `\Cref`,
     `Section `, `Fig.`, `Table ` — flag every hit (rule 14).
   → Related-Work bucket-header audit: list every `\paragraph{...}` /
@@ -267,11 +267,28 @@ Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + 17 + standin
           pointer.
       (e) Flag any `see Appendix X` pointer in a no-appendix-venue paper —
           that's a dead reference.
+  → Paired-condition-label-axis audit (rule 18): list every distinct label
+    the paper uses for its main experimental conditions (e.g., `iteration row`,
+    `no-prompt baseline`, `Ours`, `naked-modality`, `with X`, `without X`).
+    For each comparison pair, ask: are the two labels on the same naming axis?
+    If `Ours` partners with `Naked-Modality Baseline`, or `Iteration Row`
+    partners with `No-Prompt Baseline`, rewrite both to share one axis
+    (typically `{Adjective}-{condition} {ModelClass}` for an input-axis pair).
+    Verify the canonical pair is used identically across Abstract / Intro /
+    Method / Results / Conclusion (no drift to `our system` mid-paper).
+  → Writing-process-archaeology audit (rule 19): scan appendix and footnotes
+    for paragraphs describing dropped baselines, superseded comparators,
+    internal experiment codenames (`E02`, `Phase 1`, `Attempt 001`), or
+    candidate-Δ-that-was-changed explanations. These should be deleted; if
+    the choice-of-baseline justification is needed, compress to ONE sentence
+    in the main-body Baselines paragraph. If load-bearing, promote to a
+    proper named ablation subsection + table — never an apologetic appendix
+    paragraph.
   → Teaser reference: grep Intro for `Figure 1` / `Fig. 1` / `\ref{fig:teaser}`
     — must appear in ¶1 or ¶2 (rule 7).
   → Limitation pairing: every `\textbf{...}` / `**...**` limitation label
     must have a `Future work could ...` sentence in the same paragraph (rule 8).
-  These six sweeps catch the high-frequency, low-effort misses that the
+  These eight sweeps catch the high-frequency, low-effort misses that the
   4-lens scan tends to skip.
 
 Step 3: Report the arc-level findings
@@ -379,6 +396,33 @@ Step 5: Prioritize fixes
     - **Venues with strict page limit and no in-PDF appendix** — IEEE RA-L (8 pages incl. refs), IEEE T-RO (limited supplementary), ICRA standard track, IROS, most IEEE Letters: cannot relegate to an in-PDF appendix because there isn't one. Either (a) keep the config compressed inline in one tight sentence, or (b) point to a separate supplementary PDF / code release (`full hyperparameters in the code release at <url>` / `see supplementary PDF`). DO NOT write `see Appendix X` if your venue does not allow `\appendix` — reviewers will flag a dead pointer.
     - **When in doubt**: read the venue's CFP for "supplementary materials" / "appendix" guidance. CoRL/RSS default = aggressive relegation. ICRA/IROS default = inline compression + code-release pointer.
     - See experiments-results-playbook.md Step 9 (hardware paragraph) and method-relatedwork-playbook.md Step 10 (appendix-relegation) for drafting guidance under each regime.
+
+18. **Paired condition labels must share a naming axis**.
+    - Whenever the paper compares two experimental conditions to each other (treatment vs. control, ablation vs. full, ours vs. baseline), the two labels must be on the **same naming axis** — so the reader sees the pair as a pair, not as two unrelated nouns.
+    - **Same-axis examples (good)**:
+      - `Distilled-Prompt VLM` vs. `Naked-Modality VLM` — axis = "what input the VLM gets" (`{Adjective}-{input-condition} VLM` template)
+      - `With pretraining` vs. `Without pretraining` — axis = "ablation flag"
+      - `Ours (RL)` vs. `Ours (BC)` — axis = "training paradigm"
+      - `OpenVLA-7B` vs. `OpenVLA-13B` — axis = "scale"
+    - **Mixed-axis anti-patterns (bad)**:
+      - `Iteration row` vs. `No-prompt baseline` — one names a table position (`row`), the other names an experimental role (`baseline`); reader cannot tell they are the same pair
+      - `Ours` vs. `Best naked-modality` — `Ours` is an authorship marker, `Best naked-modality` is a content descriptor
+      - `With distilled prompt` vs. `Raw VLM` — one names the input intervention, the other names the model class
+    - When reviewing, list the labels of every condition the paper compares. For each pair, ask: "Are these two labels on the same axis?" If not, rewrite both to share one axis.
+    - When the label drifts (e.g., `iteration row` in §4, `iteration condition` in §3, `our system` in §1), lock to one canonical pair across the whole paper — first/last mention identical to middle mention.
+    - See language-phrasebank.md Section J for axis-aligned substitution candidates.
+
+19. **No "writing-process archaeology" in main body or appendix**.
+    - "Writing-process archaeology" = paragraphs that describe how the paper's setup or claims evolved during drafting: dropped baselines, internal experiment codenames (`E02`, `Phase 1`, `Attempt 001`), candidate Δs that were superseded, justifications for why a comparator was changed from one to another.
+    - These read as the author talking to themselves, not to the reader. Reviewers infer cherry-picking ("if you considered other baselines, why did you settle on these?"). Even when the choice is defensible, the archaeology paragraph creates the question.
+    - **Fix**: state the baseline's positive identity in the main-body Baselines paragraph and stop there. The baseline's own definition does the anti-cherry-picking work:
+      - ✓ `The Naked-Modality VLM is the strongest of {video, proprio, video+proprio} rows from the modality ablation (Table~X); the chain prompt and evaluation cap are identical to the Distilled-Prompt VLM.`
+      - ✗ `... we considered several candidates and chose the most conservative one.` ← softer archaeology; still triggers "which candidates?"
+      - ✗ `... originally we used X but switched to Y for fairness.` ← explicit archaeology
+    - **Subtractive principle**: the cleanest defense against "you cherry-picked" is to define the baseline as the *maximum* over a named set (e.g., `strongest of {...}`, `best across modalities`). The reader sees the upper-bound construction and the question dissolves — without you having to comment on the construction.
+    - No numbers from dropped baselines. No internal codenames. No "originally we used X but switched to Y" / "the most conservative of the candidates we considered" explanations — both forms trigger the same suspicion.
+    - If the dropped-baseline information is load-bearing for the argument (e.g., showing robustness across baseline choices), promote it to a full ablation **with a proper subsection name and table**, not a hidden paragraph in the appendix.
+    - See closing-appendix-playbook.md anti-patterns for the appendix-specific framing.
 
 ---
 

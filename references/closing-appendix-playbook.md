@@ -442,6 +442,7 @@ When the appendix discusses something analyzed in the main body, use:
 | No compute statement | Add CPU/GPU + memory + training time |
 | Failure cases buried at end | Move Failures to A.1 or A.2 — show you analyzed them |
 | Appendix that's just rejected main-body sections pasted in | Refactor for appendix audience |
+| **Writing-process archaeology** — `\paragraph{Within-run baseline sanity check.}` or similar, reporting baselines that were considered then dropped, internal experiment codenames (`E02`, `Phase 1`, `Attempt 001`), candidate Δs that were superseded, "originally we used X but switched to Y" justifications, or even softer hedges like "the most conservative of the candidates we considered" | **Delete the paragraph entirely.** In the main-body Baselines paragraph, define the baseline as the *maximum over a named set* — `The Naked-Modality VLM is the strongest of {video, proprio, video+proprio} rows from the modality ablation` — and stop. The upper-bound construction is the anti-cherry-picking signal; commentary about "candidates we considered" reintroduces the suspicion you just defused. If the comparison across baseline choices is load-bearing, promote it to a full named ablation subsection + table — never bury it in the appendix. See SKILL.md rule 19. |
 | Inconsistent figure-prefix convention (mixing `Figure A1` and `Figure 8`) | Pick one and apply throughout |
 | Bolding every value in hyperparameter tables | Bold only column headers, never values |
 | New claims in the appendix | Move to main body or delete |
