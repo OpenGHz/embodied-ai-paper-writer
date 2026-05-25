@@ -152,7 +152,7 @@ Templates:
 
 Pair C4+C3 as the standard refrain: "Prior work X is limited because Y. Unlike these works, we Z."
 
-### C5. "Recent work has shown" (citing as evidence, not as comparator)
+### C5. "Recent work has shown" (citing as evidence, not as baseline)
 Templates:
 - `Recent work has shown that [CLAIM] [CITES].`
 - `[CITES] [demonstrate / show] that [CLAIM].`
@@ -448,6 +448,8 @@ Overuse of hedges reads as evasive; absence reads as overclaiming. Aim for hedge
 | Many | (give the number, or "5+") |
 | Outperforms | (specify by how much, absolute or relative) |
 | State-of-the-art | (cite the prior best) |
+| **`comparator` / `comparators`** | `baseline` / `baselines` (corpus convention; `comparator` is virtually absent from CoRL/RSS/ICRA/IROS) |
+| **`comparative method`** | `baseline` |
 | **`X row` in prose** (no table cited) | `X baseline` / `X condition` / `X setting` / `X variant` (see Section K and SKILL.md rule 16) |
 | **`baseline row`** | `baseline` (drop redundant "row") |
 | **`X column` in prose** (no table cited) | `X metric` / `X axis` / `X dimension` |
@@ -470,6 +472,8 @@ Overuse of hedges reads as evasive; absence reads as overclaiming. Aim for hedge
 | `The result is significant.` | Replace "significant" with the delta and (if applicable) p-value. |
 | Stacked weak adjectives: `a novel, robust, scalable, end-to-end pipeline` | Pick the strongest one. |
 | **Table jargon in prose** — `iteration row` / `no-prompt row` / `baseline row` in Abstract, Intro, Method conceptual paragraphs, Conclusion, or Limitations (no table cited in same/prior sentence) | Replace with experiment-condition vocabulary: `iteration condition`, `no-prompt baseline` (drop redundant "row"), `our system`. Keep `row` only in Results/Ablations paragraphs that just cited `Table~\ref{...}` or `Figure~\ref{...}`. Same rule for `column` / `cell`. |
+| **Config dump in main body** — inline parenthetical listing hardware SKUs (`single H200, bfloat16; 2048 new-token cap for text-only rows, 4096 for video-bearing rows`), optimizer hyperparameters, token caps, control rates | **Venue-dependent fix (SKILL.md rule 17)**. (a) CoRL / RSS / NeurIPS / ICML / Science Robotics → relegate to in-PDF appendix; main body keeps a 1-line pointer (`hardware, precision, and token caps are in Appendix~\ref{app:hardware}`). (b) ICRA / IROS / RA-L / T-RO → cannot relegate to in-PDF appendix (it doesn't exist); compress to ONE inline sentence per category, or point to code release (`full hyperparameters in the code release at \url{...}`). NEVER write `see Appendix X` if the venue has no `\appendix`. |
+| **Dead `see Appendix X` pointer at a no-appendix venue** | Either move the content inline (compressed) or point to code release / supplementary video. Reviewers flag pointers that resolve nowhere. |
 
 ---
 
@@ -486,9 +490,11 @@ Overuse of hedges reads as evasive; absence reads as overclaiming. Aim for hedge
 | "How do I set up my method section?" | D1–D5 |
 | "How do I describe an equation / variable?" | D4 |
 | "How do I report a result?" | E1–E5 (the 4-step paragraph) |
-| "How do I report a number with no comparator?" | E3 — always pair with delta |
+| "How do I report a number with no baseline?" | E3 — always pair with delta |
 | "How do I close an ablation paragraph?" | F3 |
 | "How do I write limitations?" | G1–G4 |
 | "Which connector should I use?" | H1 table |
 | "Is `novel` / `significant` weak?" | J — yes, replace with the measurable |
+| "Is `comparator` OK in CoRL?" | J — no, use `baseline` / `baselines` |
 | "Is `iteration row` / `no-prompt row` OK in prose?" | J + K — only if a table or figure was cited in the same/prior sentence; otherwise use `condition` / `baseline` / `setting` |
+| "Where do hardware / hyperparameter config dumps go?" | K + SKILL.md rule 17 — venue-gated: CoRL/RSS/NeurIPS → appendix; ICRA/IROS/RA-L/T-RO → inline-compressed or code-release pointer |

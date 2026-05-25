@@ -237,7 +237,7 @@ Step 2: Read each drafted section through 4 lenses
   → Tense correctness: Abstract present, Conclusion past?
   → Figure/table coupling: are all main-text figures referenced?
 
-Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + standing rules)
+Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + 17 + standing rules)
   → Abstract self-containment: grep abstract for `\ref`, `\autoref`, `\Cref`,
     `Section `, `Fig.`, `Table ` — flag every hit (rule 14).
   → Related-Work bucket-header audit: list every `\paragraph{...}` /
@@ -250,11 +250,28 @@ Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + standing rul
     `\bcolumn\b`, `\bcell\b`. Each hit MUST sit in a sentence that cites a
     table or figure in the same or immediately prior sentence; otherwise
     replace with `baseline` / `condition` / `setting` / `variant` (rule 16).
+  → Config-dump-in-main-body audit (venue-gated, rule 17):
+      (a) Confirm venue. If CoRL / RSS / NeurIPS / ICML / ICLR / Science
+          Robotics → in-PDF appendix allowed. If ICRA / IROS / RA-L / T-RO →
+          no in-PDF appendix.
+      (b) Scan Method / Experimental Setup / Results for inline parentheticals
+          listing hardware SKUs (`H200`, `A100`, `RTX`, `Jetson`), precision
+          flags (`bfloat16`, `fp16`, `int8`), token caps (`new-token`,
+          `context length`), learning rates (`2e-5`, `lr=`), batch sizes
+          (`batch size`), control rates (`Hz`), random seeds.
+      (c) For appendix-supporting venues: each hit becomes a pointer
+          (`see Appendix~\ref{app:X}`); the full dense paragraph moves to
+          the appendix.
+      (d) For no-appendix venues: hits stay inline but compress to ONE
+          tight sentence per category, or move to a `(code release at <url>)`
+          pointer.
+      (e) Flag any `see Appendix X` pointer in a no-appendix-venue paper —
+          that's a dead reference.
   → Teaser reference: grep Intro for `Figure 1` / `Fig. 1` / `\ref{fig:teaser}`
     — must appear in ¶1 or ¶2 (rule 7).
   → Limitation pairing: every `\textbf{...}` / `**...**` limitation label
     must have a `Future work could ...` sentence in the same paragraph (rule 8).
-  These five sweeps catch the high-frequency, low-effort misses that the
+  These six sweeps catch the high-frequency, low-effort misses that the
   4-lens scan tends to skip.
 
 Step 3: Report the arc-level findings
@@ -337,7 +354,7 @@ Step 5: Prioritize fixes
 
 14. **Abstract is self-contained — no body-anchored cross-references**.
     - The abstract appears in isolation (arXiv listings, search snippets, program books, citation indexes). `\S\ref{sec:X}`, `see Section 4`, `as in Fig. 2`, `Table 1 reports ...` render as noise or as "§ ??" to readers who haven't opened the PDF.
-    - Allowed in abstract: numbers, named comparators, system name, dataset/model names, project URL in Move 6 coda.
+    - Allowed in abstract: numbers, named baselines, system name, dataset/model names, project URL in Move 6 coda.
     - Forbidden in abstract: any `\ref` / `\autoref` / `\Cref` to a section, figure, table, or equation in the body. Re-state the content; do not point at it.
     - When reviewing, grep abstract for `\ref`, `\autoref`, `\Cref`, `Section `, `Fig.`, `Table ` and flag every hit.
 
@@ -355,6 +372,13 @@ Step 5: Prioritize fixes
       - `the X row from the modality ablation` → `the X baseline` (the table reference belongs in the cite, not the noun)
     - In **table-anchored contexts** — Results/Ablations paragraphs that just cited `Table~\ref{...}` or `Figure~\ref{...}` — `row` is fine and even preferred for precise reference (`row 8 (video + proprio)`, `the iteration row clears 0.93`).
     - When reviewing, grep prose-context files for `\brow\b`, `\brows\b`, `\bcolumn\b`, `\bcell\b`. Each hit must either sit inside a table-anchored sentence (one cite in the same or prior sentence) or be replaced.
+
+17. **Config-parameter relegation is venue-gated**.
+    - "Config-parameter dump" = hardware SKU, precision flags, token caps, batch sizes, optimizer hyperparameters, control rates, learning-rate schedules, random seeds — the stuff that doesn't change the paper's argument but is needed for reproducibility.
+    - **Venues that support an in-PDF appendix (`\appendix` in the same compiled PDF)** — CoRL, RSS, NeurIPS, ICML, ICLR, AAAI, Science Robotics (Supplementary Materials), Nature Robotics (Methods + Extended Data): aggressively relegate. Main body keeps **only the pointer** (`hardware, precision, and token caps are in Appendix~\ref{app:identifiers}`); appendix carries the dense paragraph. Each main-text inline config detail you keep eats line budget that should go to argument.
+    - **Venues with strict page limit and no in-PDF appendix** — IEEE RA-L (8 pages incl. refs), IEEE T-RO (limited supplementary), ICRA standard track, IROS, most IEEE Letters: cannot relegate to an in-PDF appendix because there isn't one. Either (a) keep the config compressed inline in one tight sentence, or (b) point to a separate supplementary PDF / code release (`full hyperparameters in the code release at <url>` / `see supplementary PDF`). DO NOT write `see Appendix X` if your venue does not allow `\appendix` — reviewers will flag a dead pointer.
+    - **When in doubt**: read the venue's CFP for "supplementary materials" / "appendix" guidance. CoRL/RSS default = aggressive relegation. ICRA/IROS default = inline compression + code-release pointer.
+    - See experiments-results-playbook.md Step 9 (hardware paragraph) and method-relatedwork-playbook.md Step 10 (appendix-relegation) for drafting guidance under each regime.
 
 ---
 

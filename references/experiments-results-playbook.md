@@ -41,6 +41,8 @@ This pre-empts the reviewer's "how many trials?" instinct before any specific re
 
 Use a named heading or paragraph lead: `**Compared Methods.**` / `**Baselines.**` / `**Comparisons.**`
 
+**Vocabulary lock**: use `baseline` / `baselines`. The words `comparator` / `comparators` / `comparative method` are virtually absent from CoRL/RSS/ICRA/IROS corpora and read as off-venue — they sound like trial-protocol writing, not robotics-paper writing. See language-phrasebank.md Section J for the substitution rule.
+
 For EACH baseline, provide three elements in one paragraph or numbered bullet:
 
 | Element | Content |
@@ -111,18 +113,42 @@ The "zero-shot transfer" flex — used when sim-trained policy works in real —
 
 ---
 
-## Step 9 — Pack hardware & compute into one dense paragraph
+## Step 9 — Pack hardware & compute into one dense paragraph — venue-gated
 
-Hardware specs are concentrated, not scattered. Canonical structure:
+Hardware specs are concentrated, not scattered. **Whether they belong in the main body or the appendix depends on the venue** (see SKILL.md rule 17).
+
+### Step 9a — At venues that support an in-PDF appendix (CoRL / RSS / NeurIPS / ICML / ICLR / Science Robotics / Nature Robotics)
+
+**Default**: the dense paragraph lives in the **appendix** (`Implementation Details` or `Hardware Information` subsection). The main-body Experimental Setup keeps only a 1-line pointer:
+
+> `Hardware, control rates, training compute, and wall-clock training time are in Appendix~\ref{app:hardware}.`
+
+Reasoning: every line spent in the main body on `single H200 in bfloat16` is a line not spent on the argument. CoRL/RSS appendix sections are explicitly designed to absorb this load.
+
+Keep inline (in the main body) only the **load-bearing** numbers — those a reader needs to interpret the headline results:
+- The robot name (`Unitree A1`) when results are robot-specific
+- Sample size denominators (`n=21`, `15 held-out test`) that appear in result fractions
+- Anything cited later as `(n=...)` or referenced in a table
+
+### Step 9b — At venues without an in-PDF appendix (ICRA / IROS / RA-L / T-RO / IEEE Letters)
+
+Cannot relegate to an `\appendix` section because there isn't one. Two options:
+
+1. **Inline dense paragraph** (canonical structure below) — compress to ONE tight paragraph in the Experimental Setup section:
 
 ```
 robot name → core sensors → control rates → onboard compute → training compute → training time
 ```
 
-Example:
 > `We use the Unitree A1 robot with 12 joints. For exteroception, we use the Intel RealSense D435 inside the head of the robot which captures images at 10 ± 2 Hz. We run both depth backbone (10 Hz) and the base policy (50 Hz) on the Jetson NX. The deployable policy can be trained on a single 3090 GPU in less than 20 hours.`
 
-The "X hours on Y GPU" sentence is appreciated by reviewers checking reproducibility.
+2. **Code-release pointer** — for the not-load-bearing config (token caps, optimizer hyperparameters, random seeds, augmentation lists):
+
+> `Full hyperparameters, augmentation pipeline, and random seeds are in the code release at \url{https://github.com/...}.` (anonymize the URL for blind submission)
+
+**DO NOT** write `see Appendix~\ref{app:X}` if your venue does not allow `\appendix` — reviewers will flag a dead pointer.
+
+The "X hours on Y GPU" sentence is appreciated by reviewers checking reproducibility — keep it inline at no-appendix venues, move it to the appendix (with the rest of compute) at appendix-supporting venues.
 
 ---
 
@@ -131,7 +157,7 @@ The "X hours on Y GPU" sentence is appreciated by reviewers checking reproducibi
 Do not write `Table 2 shows results.` Instead, the table/figure reference and the headline number appear in the SAME sentence.
 
 **Stock template**:
-> `Table X reports {metric} across {conditions}; {our method} {verb} {comparator} by {number}.`
+> `Table X reports {metric} across {conditions}; {our method} {verb} {baseline} by {number}.`
 
 Examples:
 - `Table I shows that HARMONIC MM makes 32.2% more progress towards completing the task at each step compared to the baselines on Cleaning Table, 113.4% on Opening Door (Push), and 27.6% on Opening Door (Pull).`
@@ -141,7 +167,7 @@ Examples:
 
 ## Step 11 — Report deltas, not raw absolutes
 
-Numbers should be deltas over a named comparator: `X% better than Y`, `Z× higher`, `an absolute improvement of N pp`. When you must give an absolute, immediately pair it with a comparator.
+Numbers should be deltas over a named baseline: `X% better than Y`, `Z× higher`, `an absolute improvement of N pp`. When you must give an absolute, immediately pair it with a baseline number.
 
 | Form | Status |
 |---|---|
@@ -388,7 +414,7 @@ Emergent behavior is the most compelling form of qualitative result — it shows
 | Anti-pattern | Fix |
 |---|---|
 | `Table 2 shows results.` | Add the headline number: `Table 2 shows that X outperforms Y by Z%` |
-| Standalone absolute numbers (`we get 71.3%`) | Pair with a comparator (`71.3%, a 16.5% improvement over Y`) |
+| Standalone absolute numbers (`we get 71.3%`) | Pair with a baseline (`71.3%, a 16.5% improvement over Y`) |
 | No "we find" sentence after a table | Insert one; without it, the paper has no argument |
 | Bulleted list of multi-baseline wins | Convert to parallel-grammar sentence |
 | `We ran a t-test for significance.` | Embed `(p < 0.05)` in the claim sentence |
@@ -408,7 +434,7 @@ Emergent behavior is the most compelling form of qualitative result — it shows
 5. **List metrics with direction tags** (↑/↓) (Step 6).
 6. **List tasks as a set with axes of variation** (Step 7).
 7. **Write hardware & compute paragraph** (Step 9).
-8. **For each main result**: table-reference-with-number + we-find-sentence + delta-comparator (Steps 10–13).
+8. **For each main result**: table-reference-with-number + we-find-sentence + delta-vs-baseline (Steps 10–13).
 9. **For each ablation**: purpose statement + row-pair narration + suggesting-sentence + mechanistic-story-for-failures (Steps 18–22).
 10. **Add 1–3 `Interestingly` / `Notably` flags** for results worth dwelling on (Step 24).
 11. **For real-world results**: count + setting sentence, then step-by-step narrative, then emergent-behavior tag (Steps 28–31).
@@ -423,7 +449,7 @@ Emergent behavior is the most compelling form of qualitative result — it shows
 |---|---|
 | "How do I open my experiments section?" | 1-sentence purpose + 2–4 numbered questions |
 | "Where do I put baseline descriptions?" | First, under "Compared Methods" lead; name + mechanism + param count |
-| "Should I just say 71.3%?" | No — always pair with delta/comparator |
+| "Should I just say 71.3%?" | No — always pair with delta/baseline |
 | "How many ablation rows should I narrate?" | 2–3 pairs; not all rows |
 | "How do I write failure modes?" | 3–5 items, each with operating regime + cause |
 | "Where do I put sim vs real distinction?" | Opening anchor + re-tag in every subsection |
