@@ -237,6 +237,21 @@ Step 2: Read each drafted section through 4 lenses
   → Tense correctness: Abstract present, Conclusion past?
   → Figure/table coupling: are all main-text figures referenced?
 
+Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + standing rules)
+  → Abstract self-containment: grep abstract for `\ref`, `\autoref`, `\Cref`,
+    `Section `, `Fig.`, `Table ` — flag every hit (rule 14).
+  → Related-Work bucket-header audit: list every `\paragraph{...}` /
+    `\subsection{...}` header in Related Work. Check each is (a) a pure noun
+    phrase, (b) names the research class (not I/O, not technique, not a
+    sentence with verb), (c) shares no redundant tail with other headers,
+    (d) case-consistent with the other headers (rule 15).
+  → Teaser reference: grep Intro for `Figure 1` / `Fig. 1` / `\ref{fig:teaser}`
+    — must appear in ¶1 or ¶2 (rule 7).
+  → Limitation pairing: every `\textbf{...}` / `**...**` limitation label
+    must have a `Future work could ...` sentence in the same paragraph (rule 8).
+  These four sweeps catch the high-frequency, low-effort misses that the
+  4-lens scan tends to skip.
+
 Step 3: Report the arc-level findings
   → Show the noun-phrase chain (or where it breaks).
   → Show the move map (which sections hit which moves).
@@ -314,6 +329,18 @@ Step 5: Prioritize fixes
     - If the user argues against an edit AND the issue is **stylistic** (word choice, sentence rhythm, "I prefer it this way"): cite once, then defer to the user. They're the author.
     - If the issue is a **convention violation** that will hurt review (missing pivot, naked plot, double-roadmap, fabricated number, tense mismatch in Abstract): cite once with a corpus-pattern reason, then if user still insists, leave it but record in the delivery summary: "Kept your phrasing per your call. Note: this departs from the corpus norm — flag to your advisor for sign-off."
     - Never argue past two exchanges. Capitulate to stylistic preferences immediately; flag-and-leave for convention violations.
+
+14. **Abstract is self-contained — no body-anchored cross-references**.
+    - The abstract appears in isolation (arXiv listings, search snippets, program books, citation indexes). `\S\ref{sec:X}`, `see Section 4`, `as in Fig. 2`, `Table 1 reports ...` render as noise or as "§ ??" to readers who haven't opened the PDF.
+    - Allowed in abstract: numbers, named comparators, system name, dataset/model names, project URL in Move 6 coda.
+    - Forbidden in abstract: any `\ref` / `\autoref` / `\Cref` to a section, figure, table, or equation in the body. Re-state the content; do not point at it.
+    - When reviewing, grep abstract for `\ref`, `\autoref`, `\Cref`, `Section `, `Fig.`, `Table ` and flag every hit.
+
+15. **Related-Work bucket headers carry only distinguishing information**.
+    - Every bucket header is a pure noun phrase naming the **research class** (not the technique, not the I/O structure, not a complete sentence with verb).
+    - Compute the longest common suffix across headers. If it's more than one word, that's the paper's universal scope — drop it from every header (it's implicit). Example: four headers ending in `... on Manipulation Traces` → drop the suffix; the section heading already establishes the domain.
+    - Pick Title Case OR sentence-case and apply to **every** header in the section. Mixed case is a tell.
+    - See method-relatedwork-playbook.md Step 2 for the full anti-pattern table.
 
 ---
 

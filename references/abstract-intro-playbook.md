@@ -205,6 +205,9 @@ End the intro with an organization paragraph if (a) venue is IEEE-style, (b) pap
 | **Hedging precedence** | `To our knowledge, we are the first to ...` | `We are the first to ...` (bare) |
 | **Hyperbole adjectives** | Strip them: `Novel`, `New`, `Optimal`, `Best`, `Definitive` | Keep | drop or replace |
 | **Numbers in abstract** | Deltas (`+12% over X`) or as-of claims (`SOTA on three benchmarks`) | Absolutes (`87.3%`) without baseline |
+| **Cross-references** | None — abstract is self-contained | `(\S\ref{sec:X})`, `see Section 4`, `as in Fig. 2`, `Table 1 reports ...` |
+
+**Why no cross-refs in the abstract**: the abstract is read in isolation — in arXiv listings, search results, program books, citation indexes. A `\S\ref{sec:supervised_baselines}` renders as "§ 4.4" (or worse, "§ ??" if compilation fails) to a reader who has never opened the PDF. Body-anchored references inside the abstract are noise to ~80% of the readership. The single exception: a project-page or release URL in the optional Move 6 coda is fine because the URL resolves anywhere; section/figure refs do not.
 
 ---
 
@@ -241,6 +244,7 @@ Section 2's first paragraph opens with a **topical subheading** (bold, ending wi
 | "My abstract opens with my method name" | Rewrite opener as broad capability/problem-class frame |
 | "My abstract has no 'However' hinge" | Insert an explicit pivot sentence at Move 2 |
 | "My abstract has no numeric results" | Add delta-form results (Move 5) or replace with moral close (Move 6′) |
+| "My abstract references a section / figure / table" | Delete the `\ref` — the abstract must be self-contained for off-paper readers (arXiv listings, search snippets). Body-pointers belong in the Intro. |
 | "My intro is 7+ paragraphs" | Compress prior-work survey; move detail to Related Work section |
 | "Where do I put 'Our contributions'?" | Last paragraph of intro, bulleted/numbered |
 | "Should I include a roadmap paragraph?" | Only for IEEE-style venues OR theory papers with unusual section order |

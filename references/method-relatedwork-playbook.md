@@ -24,9 +24,25 @@ Use this when the user asks: "Help me write related work", "How should I structu
 
 Pick exactly **2–4 topical subsections**, never more (reviewers stop reading after 4). Each subsection covers ONE prior-work theme that your contribution either builds on or differs from.
 
-**Naming convention**: subsections are noun phrases naming the *theme*, not the *technique*:
-- ✓ "Whole-body Control", "Manipulation with Foundation Models", "Sim-to-Real Transfer"
-- ✗ "PPO-based methods", "Diffusion-model-based policies"
+**Naming convention**: subsections are **noun phrases naming the research class** that the surveyed work belongs to. Four anti-patterns to avoid:
+
+| Anti-pattern | Example (bad) | Fix |
+|---|---|---|
+| Technique-named instead of theme-named | `**PPO-based methods.**`, `**Diffusion-model-based policies.**` | `**Reinforcement-Learning Manipulation.**`, `**Generative Visuomotor Policies.**` |
+| I/O-described instead of class-named | `**Manipulation-trace inputs, divergent prediction targets.**`, `**Trajectory inputs, action outputs.**` | `**VLM/VLA Models for Manipulation.**`, `**Action-Conditioned Trajectory Models.**` |
+| Complete sentence with verb (header is doing the bucket's argumentation) | `**Failure reasoning and probe-as-signal differ on what to do with the failed sub-attempt.**` | Strip the verb. Keep `**Failure Reasoning Systems.**`; move the contrast into the paragraph body. |
+| Shared redundant tail across headers (universal qualifier) | `**VLM/VLA Models on Manipulation Traces.**` + `**Failure Reasoning on Manipulation Traces.**` + ... | Drop the universal qualifier (`on Manipulation Traces` is the paper's subject — every bucket has it implicitly). Keep only what *distinguishes* this bucket: `**VLM/VLA Models for Manipulation.**`, `**Failure Reasoning Systems.**` |
+
+**Distinctness rule**: each bucket header must carry only the *distinguishing* information against the other 2–3 headers in the same Related Work. Compute the longest common suffix across your headers; if it's more than one word, that suffix is the paper's universal scope — remove it from all headers.
+
+**Case-consistency rule**: pick Title Case OR sentence-case and use it for **every** bucket header in the section. Never mix.
+- Title Case (CoRL most common): `**Whole-Body Control.**`, `**Manipulation with Foundation Models.**` — virtually all content words capitalized; lowercase only short function words (`for`, `and`, `on`, `of`, `in`).
+- Sentence-case: `**Whole-body control.**`, `**Manipulation with foundation models.**`
+- Mixed (e.g., ¶1 ¶2 Title Case + ¶3 ¶4 sentence-case) is a tell that the section was assembled in two passes — reviewers notice.
+
+Good examples (corpus):
+- ✓ `**Whole-Body Control.**` · `**Manipulation with Foundation Models.**` · `**Sim-to-Real Transfer.**` · `**Vision-Language-Action Models.**`
+- ✓ `**VLM/VLA Models for Manipulation.**` · `**Failure Reasoning Systems.**` (distinct, no shared tail, Title Case)
 
 Two common layouts:
 
@@ -120,6 +136,10 @@ Add scope qualifiers (`on real hardware`, `under partial observability`, `for hi
 | No positioning closer | Every subsection MUST end with a positioning sentence |
 | Citing yourself without flagging it | Use `Our prior work [X] showed ...` to disclose |
 | "Many works have ..." with no citation | Cite or delete |
+| Bucket header describes the surveyed work's I/O (`Trajectory inputs, action outputs.`) | Rename as the research-class noun phrase (`Action-Conditioned Trajectory Models.`) |
+| Bucket header is a complete sentence with a verb | Strip the verb; keep only the noun phrase. Move the argumentation into the paragraph body. |
+| Bucket headers share a redundant trailing phrase (`... on Manipulation Traces.` in every header) | Drop the universal qualifier; headers carry only distinguishing info |
+| Mixed case across bucket headers (some Title Case, some sentence-case) | Lock to one convention; Title Case is the CoRL default |
 
 ---
 
