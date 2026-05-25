@@ -237,7 +237,7 @@ Step 2: Read each drafted section through 4 lenses
   → Tense correctness: Abstract present, Conclusion past?
   → Figure/table coupling: are all main-text figures referenced?
 
-Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + standing rules)
+Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + standing rules)
   → Abstract self-containment: grep abstract for `\ref`, `\autoref`, `\Cref`,
     `Section `, `Fig.`, `Table ` — flag every hit (rule 14).
   → Related-Work bucket-header audit: list every `\paragraph{...}` /
@@ -245,11 +245,16 @@ Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + standing rules)
     phrase, (b) names the research class (not I/O, not technique, not a
     sentence with verb), (c) shares no redundant tail with other headers,
     (d) case-consistent with the other headers (rule 15).
+  → Table-jargon-in-prose audit: grep Abstract / Intro / Method (conceptual
+    paragraphs) / Conclusion / Limitations for `\brow\b`, `\brows\b`,
+    `\bcolumn\b`, `\bcell\b`. Each hit MUST sit in a sentence that cites a
+    table or figure in the same or immediately prior sentence; otherwise
+    replace with `baseline` / `condition` / `setting` / `variant` (rule 16).
   → Teaser reference: grep Intro for `Figure 1` / `Fig. 1` / `\ref{fig:teaser}`
     — must appear in ¶1 or ¶2 (rule 7).
   → Limitation pairing: every `\textbf{...}` / `**...**` limitation label
     must have a `Future work could ...` sentence in the same paragraph (rule 8).
-  These four sweeps catch the high-frequency, low-effort misses that the
+  These five sweeps catch the high-frequency, low-effort misses that the
   4-lens scan tends to skip.
 
 Step 3: Report the arc-level findings
@@ -341,6 +346,15 @@ Step 5: Prioritize fixes
     - Compute the longest common suffix across headers. If it's more than one word, that's the paper's universal scope — drop it from every header (it's implicit). Example: four headers ending in `... on Manipulation Traces` → drop the suffix; the section heading already establishes the domain.
     - Pick Title Case OR sentence-case and apply to **every** header in the section. Mixed case is a tell.
     - See method-relatedwork-playbook.md Step 2 for the full anti-pattern table.
+
+16. **No table jargon (`row`, `column`, `cell`) in prose contexts**.
+    - `row` / `column` / `cell` force the reader to picture a table that isn't on the page. They are legitimate only when the current paragraph just cited a specific table or figure (`Table~\ref{tab:X}` / `Fig.~\ref{fig:Y}` in the same or immediately prior sentence).
+    - In **prose contexts** — Abstract, Introduction, Method conceptual paragraphs, Conclusion, Limitations — replace table jargon with experiment-condition vocabulary: `baseline`, `condition`, `setting`, `variant`, `system`. Specifically:
+      - `no-prompt row` / `baseline row` → `no-prompt baseline` (drop redundant "row" — "baseline" already names the role)
+      - `iteration row` / `our row` → `iteration condition` / `our system` / `{SystemName}`
+      - `the X row from the modality ablation` → `the X baseline` (the table reference belongs in the cite, not the noun)
+    - In **table-anchored contexts** — Results/Ablations paragraphs that just cited `Table~\ref{...}` or `Figure~\ref{...}` — `row` is fine and even preferred for precise reference (`row 8 (video + proprio)`, `the iteration row clears 0.93`).
+    - When reviewing, grep prose-context files for `\brow\b`, `\brows\b`, `\bcolumn\b`, `\bcell\b`. Each hit must either sit inside a table-anchored sentence (one cite in the same or prior sentence) or be replaced.
 
 ---
 

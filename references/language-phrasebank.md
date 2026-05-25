@@ -448,6 +448,9 @@ Overuse of hedges reads as evasive; absence reads as overclaiming. Aim for hedge
 | Many | (give the number, or "5+") |
 | Outperforms | (specify by how much, absolute or relative) |
 | State-of-the-art | (cite the prior best) |
+| **`X row` in prose** (no table cited) | `X baseline` / `X condition` / `X setting` / `X variant` (see Section K and SKILL.md rule 16) |
+| **`baseline row`** | `baseline` (drop redundant "row") |
+| **`X column` in prose** (no table cited) | `X metric` / `X axis` / `X dimension` |
 
 **Test**: if you delete the adjective, does the sentence say less? If not, delete it.
 
@@ -466,6 +469,7 @@ Overuse of hedges reads as evasive; absence reads as overclaiming. Aim for hedge
 | `We achieve impressive results.` | Replace "impressive" with the number. |
 | `The result is significant.` | Replace "significant" with the delta and (if applicable) p-value. |
 | Stacked weak adjectives: `a novel, robust, scalable, end-to-end pipeline` | Pick the strongest one. |
+| **Table jargon in prose** — `iteration row` / `no-prompt row` / `baseline row` in Abstract, Intro, Method conceptual paragraphs, Conclusion, or Limitations (no table cited in same/prior sentence) | Replace with experiment-condition vocabulary: `iteration condition`, `no-prompt baseline` (drop redundant "row"), `our system`. Keep `row` only in Results/Ablations paragraphs that just cited `Table~\ref{...}` or `Figure~\ref{...}`. Same rule for `column` / `cell`. |
 
 ---
 
@@ -487,3 +491,4 @@ Overuse of hedges reads as evasive; absence reads as overclaiming. Aim for hedge
 | "How do I write limitations?" | G1–G4 |
 | "Which connector should I use?" | H1 table |
 | "Is `novel` / `significant` weak?" | J — yes, replace with the measurable |
+| "Is `iteration row` / `no-prompt row` OK in prose?" | J + K — only if a table or figure was cited in the same/prior sentence; otherwise use `condition` / `baseline` / `setting` |
