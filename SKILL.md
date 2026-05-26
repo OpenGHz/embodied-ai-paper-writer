@@ -237,7 +237,7 @@ Step 2: Read each drafted section through 4 lenses
   → Tense correctness: Abstract present, Conclusion past?
   → Figure/table coupling: are all main-text figures referenced?
 
-Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + 17 + 18 + 19 + 20 + standing rules)
+Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + 17 + 18 + 19 + 20 + 21 + standing rules)
   **Preferred path**: invoke the tool that automates these sweeps:
     `<skill-dir>/tools/audit_conventions.sh --strict`
   Run from the paper directory (with main.tex). The tool follows every
@@ -317,11 +317,22 @@ Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + 17 + 18 + 19
     (`the exploratory trace` → `the trace`; `the held-out groups` → `the
     test groups`). Flag stacked redundancies like `successful exploratory`
     or `held-out test` when the second word already implies the first.
+  → Concept-vs-instantiation audit (rule 21): identify any instantiation
+    noun the paper might be leaking into conceptual framing positions
+    (e.g., `demo`/`demos`/`demonstration` when the framework-level concept
+    is `trace`; `controller` when the concept is `policy`; `trial` when the
+    concept is `episode`). The `vocab-lock` sweep in
+    `tools/audit_conventions.sh` (config field `VOCAB_LOCK_PATTERNS`) is
+    the operational tool — every hit is listed for manual verification;
+    the source-disclosure site (typically Experiments / Appendix dataset
+    section) is expected to appear and is legitimate, but any occurrence in
+    Abstract / Intro / Method / Results / Conclusion framing positions
+    should be replaced with the conceptual noun.
   → Teaser reference: grep Intro for `Figure 1` / `Fig. 1` / `\ref{fig:teaser}`
     — must appear in ¶1 or ¶2 (rule 7).
   → Limitation pairing: every `\textbf{...}` / `**...**` limitation label
     must have a `Future work could ...` sentence in the same paragraph (rule 8).
-  These nine sweeps catch the high-frequency, low-effort misses that the
+  These ten sweeps catch the high-frequency, low-effort misses that the
   4-lens scan tends to skip.
 
 Step 3: Report the arc-level findings
@@ -469,6 +480,31 @@ Step 5: Prioritize fixes
     - **Exception**: when the modifier carries a *local* meaning (e.g., `the second, successful pull` describing the second drawer-pull attempt that succeeded after the first failed), keep it — here `successful` modifies `pull`, not the framework-level concept. The rule is about modifier-as-framework-scope-tag, not modifier-as-local-adjective.
     - When reviewing, grep prose for the load-bearing modifiers the paper introduces. Count occurrences. If a modifier appears in 3+ places outside its definition site, flag every redundant repetition.
     - This is the modifier analog of rule 2 (lock the contribution noun phrase): rule 2 keeps the *system name* identical across re-mentions; rule 20 keeps the *scope-tag modifier* in one place only.
+
+21. **Lock the type-general noun; isolate the concrete instantiation to a source-disclosure site**.
+    - For each data object the paper reasons about, pick the **most type-general noun** that names what the object *is* (a stream / a record / a measurement), not what it *came from* (a demonstration / a rollout / a replay buffer / a teleop session). Use that conceptual noun everywhere — Abstract, Intro, Method, Results, Conclusion — and reveal the concrete instantiation only at the source-disclosure site (typically Experiments setup or Appendix dataset section).
+    - **Why**: instantiation-named nouns lock the contribution to one data regime. If the paper writes "iterates on demos" throughout, reviewers infer the method requires demonstrations and won't work on inference logs, replay-buffer entries, or live recordings — even when nothing in the method actually depends on the data being a demonstration. The conceptual noun keeps the contribution portable across sources.
+    - **Example (the `trace` vs `demonstration` case)**:
+      - ✓ Abstract: `iterates on traces with access to ground-truth chain labels`
+      - ✓ Intro / Method / Results / Conclusion: `the task's traces`, `the agent reads the trace input`, `each trace`
+      - ✓ Appendix `app:datasets`: `Each trace in this paper is a recorded demonstration (simulator: AdaManip rollout; real-robot: human teleoperation). The framework treats trace as a generic data type and is not demonstration-specific: alternative sources such as model inference logs or replay-buffer entries could compose unchanged.`
+      - ✗ Abstract: `iterates on demos` (instantiation noun in conceptual framing position)
+      - ✗ Method figure caption: `iterates on the task's demo data` (same — demo-bound framing)
+    - **Other common concept/instantiation pairs in embodied-AI**:
+
+      | Concept noun (use throughout) | Concrete instantiation (only at source-disclosure) |
+      |---|---|
+      | `trace` / `trajectory` | `demonstration`, `rollout`, `replay-buffer entry`, `teleop session`, `inference log` |
+      | `policy` / `controller` | `transformer policy`, `diffusion policy`, `MLP controller` |
+      | `episode` | `trial`, `attempt`, `run`, `recording` |
+      | `observation` | `RGB frame`, `point cloud`, `joint encoder reading` |
+      | `dataset` | `OpenX subset`, `BridgeData V2`, `our 60-demo collection` |
+      | `reward signal` | `sparse +1`, `shaped potential`, `LLM-judged scalar` |
+      | `latent` | `bottleneck`, `embedding`, `VAE z` |
+
+    - **Exception (mirrors rule 20's local-adjective exception)**: when the instantiation noun appears at the source-disclosure site itself, or in a sentence whose specific purpose is naming the implementation (`we use the Unitree A1 robot`, `60 demonstrations collected on physical hardware`), keep it. The rule is about leakage of instantiation framing into the conceptual layer, not about banning the word.
+    - **Detection**: the `vocab-lock` sweep in `tools/audit_conventions.sh` (config field `VOCAB_LOCK_PATTERNS`) is the operational tool. Add the instantiation noun(s) the paper should not leak into conceptual framing (e.g., `\bdemo\b`, `\bdemos\b`, `\bcontroller\b`); the sweep lists every occurrence for manual verification. The source-disclosure site will appear in the list — that's expected; the auditor's job is to surface, the reviewer's job is to verify each hit is legitimately at a disclosure site, not at a framing site.
+    - This is the **noun analog** of rule 20 (which is about modifier-level scope tags). Rule 20 controls *adjective* leakage; rule 21 controls *noun* leakage. Together they form the "lock the abstraction layer; isolate concretizations to disclosure sites" pattern.
 
 ---
 
