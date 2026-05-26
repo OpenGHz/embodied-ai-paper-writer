@@ -238,8 +238,32 @@ Step 2: Read each drafted section through 4 lenses
   → Figure/table coupling: are all main-text figures referenced?
 
 Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + 17 + 18 + 19 + 20 + standing rules)
-  → Abstract self-containment: grep abstract for `\ref`, `\autoref`, `\Cref`,
-    `Section `, `Fig.`, `Table ` — flag every hit (rule 14).
+  **Preferred path**: invoke the tool that automates these sweeps:
+    `<skill-dir>/tools/audit_conventions.sh --strict`
+  Run from the paper directory (with main.tex). The tool follows every
+  `\input{...}` (including symlinked figure dirs via `find -L`), so it
+  catches drift in `sections/*.tex`, `figures/*.tex`, `figures/*/*.tex`,
+  and any other `\input`'d file. It auto-loads `audit_conventions.conf`
+  from the paper dir if present (per-paper config for project-specific
+  old labels, system names, scope-tag modifiers). See
+  `tools/audit_conventions.example.conf` for the schema. Run
+  `audit_conventions.sh --list` to list available sweeps.
+
+  **Why automation matters**: manual grep over `sections/*.tex` only
+  systematically misses figure/table captions in `figures/*.tex` —
+  this happened to us and a reviewer would have flagged it. The tool's
+  recursive `\input` discovery is the only robust way to enumerate
+  everything the build pulls in.
+
+  **Manual fallback** (if the tool is unavailable, or to spot-check a
+  specific sweep):
+  → Abstract self-containment + method-internal jargon: grep abstract for
+    (a) `\ref`, `\autoref`, `\Cref`, `Section `, `Fig.`, `Table ` (rule 14
+    — body-anchored cross-references); (b) `gate`, `commit`, `converge`,
+    `epoch`, `early stopping`, `iteration` (training-loop control flow),
+    plus the paper's specific hyperparameter names (e.g., `K=3`, `0.85`)
+    that should live in Method, not Abstract. Flag every hit
+    (abstract-intro-playbook.md Move 4 method-internal table).
   → Related-Work bucket-header audit: list every `\paragraph{...}` /
     `\subsection{...}` header in Related Work. Check each is (a) a pure noun
     phrase, (b) names the research class (not I/O, not technique, not a
