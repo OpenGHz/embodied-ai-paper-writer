@@ -237,7 +237,7 @@ Step 2: Read each drafted section through 4 lenses
   → Tense correctness: Abstract present, Conclusion past?
   → Figure/table coupling: are all main-text figures referenced?
 
-Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + 17 + 18 + 19 + standing rules)
+Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + 17 + 18 + 19 + 20 + standing rules)
   → Abstract self-containment: grep abstract for `\ref`, `\autoref`, `\Cref`,
     `Section `, `Fig.`, `Table ` — flag every hit (rule 14).
   → Related-Work bucket-header audit: list every `\paragraph{...}` /
@@ -284,11 +284,20 @@ Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + 17 + 18 + 19
     in the main-body Baselines paragraph. If load-bearing, promote to a
     proper named ablation subsection + table — never an apologetic appendix
     paragraph.
+  → Load-bearing-modifier audit (rule 20): identify the scope-tag modifiers
+    the paper introduces in Problem Setup / Abstract / Intro (e.g.,
+    `successful`, `exploratory`, `held-out`, `task-keyed`, `frozen`,
+    `naked-modality`, `minimal-success`). For each, grep the rest of the
+    paper for occurrences. The first definition site keeps the modifier;
+    every subsequent occurrence outside a local-adjective use should drop it
+    (`the exploratory trace` → `the trace`; `the held-out groups` → `the
+    test groups`). Flag stacked redundancies like `successful exploratory`
+    or `held-out test` when the second word already implies the first.
   → Teaser reference: grep Intro for `Figure 1` / `Fig. 1` / `\ref{fig:teaser}`
     — must appear in ¶1 or ¶2 (rule 7).
   → Limitation pairing: every `\textbf{...}` / `**...**` limitation label
     must have a `Future work could ...` sentence in the same paragraph (rule 8).
-  These eight sweeps catch the high-frequency, low-effort misses that the
+  These nine sweeps catch the high-frequency, low-effort misses that the
   4-lens scan tends to skip.
 
 Step 3: Report the arc-level findings
@@ -423,6 +432,19 @@ Step 5: Prioritize fixes
     - No numbers from dropped baselines. No internal codenames. No "originally we used X but switched to Y" / "the most conservative of the candidates we considered" explanations — both forms trigger the same suspicion.
     - If the dropped-baseline information is load-bearing for the argument (e.g., showing robustness across baseline choices), promote it to a full ablation **with a proper subsection name and table**, not a hidden paragraph in the appendix.
     - See closing-appendix-playbook.md anti-patterns for the appendix-specific framing.
+
+20. **Lock load-bearing modifiers, then drop them outside the definition**.
+    - Many embodied-AI papers introduce a *modifier* that scopes the contribution: `successful` exploratory trace, `held-out` test groups, `task-keyed` prompt entry, `frozen` base VLM, `naked-modality` baseline, `minimal-success` action chain. Each such modifier is **load-bearing once** — at the place where the term is first defined or scoped — and then becomes wallpaper if repeated.
+    - **Rule**: define the modifier exactly once (in Problem Setup / first introduction / Abstract), then drop it from every subsequent reference. The reader carries the modifier mentally; repeating it implies the author is afraid the reader will forget.
+    - **Example (the `successful exploratory trace` case)**:
+      - ✓ §3.1 Problem Setup: `We consider procedural reasoning over a successful exploratory manipulation trace ...` (definition; modifier carried by the reader)
+      - ✓ §2/§4/§5/§7: `the exploratory trace`, `the trace`, `this trace` (modifier dropped — already in the reader's mental model)
+      - ✗ §2 ¶1: `In contrast, we frame chain prediction over a successful exploratory trace ...` (redundant repetition)
+      - ✗ §2 ¶2: `in a successful trace, the same first pull-failure is signal that ...` (the modifier is doing no new work here)
+    - **Watch for stacked redundancy**: `the successful exploratory trace's probe segment` triple-loads `successful` + `exploratory` + `'s probe`. After the first definition, drop both `successful` and `exploratory` — `the trace's probe segment` is unambiguous.
+    - **Exception**: when the modifier carries a *local* meaning (e.g., `the second, successful pull` describing the second drawer-pull attempt that succeeded after the first failed), keep it — here `successful` modifies `pull`, not the framework-level concept. The rule is about modifier-as-framework-scope-tag, not modifier-as-local-adjective.
+    - When reviewing, grep prose for the load-bearing modifiers the paper introduces. Count occurrences. If a modifier appears in 3+ places outside its definition site, flag every redundant repetition.
+    - This is the modifier analog of rule 2 (lock the contribution noun phrase): rule 2 keeps the *system name* identical across re-mentions; rule 20 keeps the *scope-tag modifier* in one place only.
 
 ---
 
