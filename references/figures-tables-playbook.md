@@ -21,7 +21,26 @@ Embodied-AI papers cluster figures into 8 recurring roles. The role determines c
 | **F7** | Ablation visualization | Show component impact | Results section | 2–3 |
 | **F8** | Failure cases | Demonstrate intellectual honesty | Discussion or appendix | 2–3 |
 
-**Universal expectation**: every embodied-AI paper has at least F1 (teaser), F2 (architecture), F3 (hardware), F4 (tasks), and either F6 (plot) or a results table.
+**Universal expectation**: every embodied-AI paper has at least F1 (teaser), F2 (architecture), F3 (hardware), F4 (tasks), and either F6 (plot) or a results table — **never both for the same dataset**.
+
+---
+
+## Step 1b — One representation per dataset (dedup gate)
+
+**Hard rule**: a single dataset (e.g., "5 tasks × 2 conditions × chain accuracy") must appear in exactly ONE of {figure, table} in the main body. Duplicating the same numbers as both a bar chart and a table wastes page budget and signals to reviewers that the authors padded the paper.
+
+**Decision heuristic — figure vs table**:
+
+| Choose **table** when | Choose **figure** when |
+|---|---|
+| Exact fractions matter (e.g., 14/15 = 0.933) | Trend/shape matters more than exact numbers |
+| Downstream tables reference these numbers | The visual pattern (gap, non-monotonicity) is the claim |
+| Few conditions (≤5 rows × ≤5 cols) | Many conditions where a heatmap/curve reveals structure |
+| Per-condition annotations needed (e.g., "(proprio)") | Color/position encoding adds information text cannot |
+
+**Corollary**: if a figure and a table show the same data with the same granularity, delete the figure (tables are more information-dense and serve as citable reference sources). Keep the figure only if it reveals a pattern that the table cannot (e.g., a training curve's shape, a spatial heatmap).
+
+**Appendix exception**: an appendix may show a detailed table whose main-body counterpart is a summary figure — but only when the appendix table adds rows/columns not in the figure (e.g., per-seed breakdown). If the appendix table is a strict superset, the main-body figure is redundant.
 
 ---
 
@@ -360,6 +379,7 @@ This 5-step rhythm is the standard structure of Results paragraphs in top embodi
 
 | Anti-pattern | Fix |
 |---|---|
+| Same data shown as both figure AND table in main body | Pick one: table if exact numbers matter, figure if visual pattern is the claim. See Step 1b. |
 | Vague reference: `Our method works well (see plots).` | Specific: `Our method achieves 87.2% success rate (Fig. 5, blue line) vs. 61.4% for the strongest baseline (orange line).` |
 | Caption that only labels: `Goalkeeper task.` for a main results figure | Add takeaway sentence + statistical disclosure |
 | Missing statistical aggregation in plot caption | Add `mean ± stderr`, sample size, and aggregation method |

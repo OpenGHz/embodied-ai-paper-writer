@@ -237,7 +237,7 @@ Step 2: Read each drafted section through 4 lenses
   → Tense correctness: Abstract present, Conclusion past?
   → Figure/table coupling: are all main-text figures referenced?
 
-Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + 17 + 18 + 19 + 20 + 21 + standing rules)
+Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + 17 + 18 + 19 + 20 + 21 + 22 + standing rules)
   **Preferred path**: invoke the tool that automates these sweeps:
     `<skill-dir>/tools/audit_conventions.sh --strict`
   Run from the paper directory (with main.tex). The tool follows every
@@ -328,11 +328,22 @@ Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + 17 + 18 + 19
     section) is expected to appear and is legitimate, but any occurrence in
     Abstract / Intro / Method / Results / Conclusion framing positions
     should be replaced with the conceptual noun.
+  → New-task naming audit (rule 22): if the paper proposes a new QA task /
+    benchmark / evaluation formulation, verify it has a named abbreviation
+    with full expansion on first mention in Abstract, Intro, and Method.
+    Grep for generic descriptors that signal an unnamed task: `\bour QA\b`,
+    `\bthe QA task\b`, `\bour task\b`, `procedural[ -]?QA`, `manipulation
+    reasoning task`. Each hit indicates the paper is leaning on a generic
+    handle where a proper name is needed. Also verify: the abbreviation
+    appears in `\keywords{...}`; the task name is consistent across
+    Abstract / Intro / Method / figure & table captions / appendix; the
+    `vocab-lock` config locks any legacy descriptors used in earlier
+    drafts (e.g., `procedural-QA`) to prevent regression.
   → Teaser reference: grep Intro for `Figure 1` / `Fig. 1` / `\ref{fig:teaser}`
     — must appear in ¶1 or ¶2 (rule 7).
   → Limitation pairing: every `\textbf{...}` / `**...**` limitation label
     must have a `Future work could ...` sentence in the same paragraph (rule 8).
-  These ten sweeps catch the high-frequency, low-effort misses that the
+  These eleven sweeps catch the high-frequency, low-effort misses that the
   4-lens scan tends to skip.
 
 Step 3: Report the arc-level findings
@@ -505,6 +516,22 @@ Step 5: Prioritize fixes
     - **Exception (mirrors rule 20's local-adjective exception)**: when the instantiation noun appears at the source-disclosure site itself, or in a sentence whose specific purpose is naming the implementation (`we use the Unitree A1 robot`, `60 demonstrations collected on physical hardware`), keep it. The rule is about leakage of instantiation framing into the conceptual layer, not about banning the word.
     - **Detection**: the `vocab-lock` sweep in `tools/audit_conventions.sh` (config field `VOCAB_LOCK_PATTERNS`) is the operational tool. Add the instantiation noun(s) the paper should not leak into conceptual framing (e.g., `\bdemo\b`, `\bdemos\b`, `\bcontroller\b`); the sweep lists every occurrence for manual verification. The source-disclosure site will appear in the list — that's expected; the auditor's job is to surface, the reviewer's job is to verify each hit is legitimately at a disclosure site, not at a framing site.
     - This is the **noun analog** of rule 20 (which is about modifier-level scope tags). Rule 20 controls *adjective* leakage; rule 21 controls *noun* leakage. Together they form the "lock the abstraction layer; isolate concretizations to disclosure sites" pattern.
+
+22. **A proposed new task must have a named abbreviation, defined once and locked everywhere**.
+    - When the paper proposes a **new QA task / benchmark / evaluation formulation** (not just a new method on an existing task), the task **must** have a named abbreviation. Generic descriptors like `procedural QA`, `manipulation reasoning task`, `our QA task` are not citable, not memorable, and reviewers will not retain them. Named tasks survive in citation graphs; generic descriptors do not.
+    - **Corpus naming pattern**: `{Domain}-QA` / `{Domain}-Bench` / `{Domain}Bench`. Examples reviewers expect to recognize: VQA, RoboVQA, ManipBench, EgoPlan-Bench2, OpenX, R2D2-VQA, HARMONIC-MM. The abbreviation expands to a noun phrase that reads naturally in the title and section openers.
+    - **First-mention convention**: introduce the task with `{Full Expansion} ({Abbreviation})` exactly once per major section (Abstract, Intro ¶3, Method §3.1 / Problem Setup). After first mention in each section, use the abbreviation only.
+    - **Definition site**: the formal definition (input → output → metric) lives in Method's Problem Setup subsection. The Abstract and Intro use the abbreviation + a one-line gloss ("the task of predicting the minimal-success action chain that explains a trace"); the Method section gives the full I/O spec.
+    - **Example (the EMT-QA case)**:
+      - ✓ Abstract S2: `... pipeline for *Exploratory Manipulation Trace QA* (EMT-QA): ...`
+      - ✓ Intro ¶3: `... pipeline for *Exploratory Manipulation Trace QA* (EMT-QA), the task of predicting the minimal-success action chain that explains an exploratory manipulation trace.`
+      - ✓ Method §3.1: `We introduce *Exploratory Manipulation Trace QA* (EMT-QA), a chain-prediction task over a successful exploratory manipulation trace. Given a synchronized stream of (i) ..., (ii) ..., (iii) ..., the system must output the *minimal-success action chain* ...`
+      - ✓ §4/§5/§6/§7/Appendix: `EMT-QA chain accuracy`, `the EMT-QA target strings`, `the EMT-QA chain question`, `EMT-QA artifacts`
+      - ✗ Anywhere: `procedural-QA`, `procedural multimodal QA`, `our QA task`, `the QA we propose` (generic descriptors with no abbreviation — reviewers won't remember or cite this)
+    - **Title alignment** (optional but strong): if the task is a primary contribution, the title should signal the task domain. The expansion noun phrase should be parseable from the title without the abbreviation (`... for Exploratory Manipulation Trace QA` is fine; `... for EMT-QA` in a title is not — title readers don't have the expansion yet).
+    - **Keywords entry**: the abbreviation belongs in the `\keywords{...}` list alongside the method name and domain (e.g., `EMT-QA, exploratory manipulation, prompt distillation`).
+    - **Detection**: when reviewing, grep the paper for `\bQA\b` / `\bbenchmark\b` / `\btask\b` in framing positions (Abstract, Intro, Method opener). If the paper reaches for a generic descriptor where a proper name should be, flag it. The `vocab-lock` sweep can also lock legacy generic descriptors (`procedural-QA`, `our task`) once the proper name is chosen, preventing regression.
+    - **Sibling to rule 2** (lock contribution noun phrase). Rule 2 locks the *system name* (`Closed-Loop Trace Distillation`); rule 22 locks the *task name* (`EMT-QA`). A paper that proposes a method + a task + a trained artifact needs all three names locked independently. Worked example of a fully-named triad: **EMT-QA** (task, rule 22) × **Closed-Loop Trace Distillation** (method, rule 2) × **Distilled Reading Heuristic / DRH** (artifact, rule 2 — same locking discipline as system names). Picking same-root abbreviations across the triad (here `Distill-` shared by method and artifact) makes the contribution scannable as a single citation entity.
 
 ---
 
