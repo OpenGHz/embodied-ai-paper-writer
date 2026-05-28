@@ -306,9 +306,9 @@ Format conventions:
 
 ---
 
-## Step 10 — Use the appendix-relegation pattern aggressively
+## Step 10 — Use the appendix-relegation pattern aggressively — venue-gated
 
-Every page-budgeted paper relegates extensively to appendix. Marker sentences:
+**This step applies only at venues that support an in-PDF appendix** (CoRL / RSS / NeurIPS / ICML / ICLR / AAAI / Science Robotics / Nature Robotics). At those venues, every page-budgeted paper relegates extensively to appendix. Marker sentences:
 
 | Content type | Marker sentence template |
 |---|---|
@@ -317,8 +317,25 @@ Every page-budgeted paper relegates extensively to appendix. Marker sentences:
 | Proofs | "We defer the proof to Appendix Z." |
 | Extended results | "See Appendix W for additional results." |
 | Notation tables | "A full notation glossary is provided in Appendix V." |
+| Hardware / compute | "Hardware, precision, and token caps are in Appendix~\ref{app:hardware}." |
 
-**Rule**: the Method in main text is the *minimum sufficient* description. The appendix is the *complete* description. A first-draft Method is almost always too long — trim by relegating.
+**Rule (appendix-supporting venues)**: the Method in main text is the *minimum sufficient* description. The appendix is the *complete* description. A first-draft Method is almost always too long — trim by relegating.
+
+### Step 10b — At venues without in-PDF appendix (ICRA / IROS / RA-L / T-RO / IEEE Letters)
+
+These venues have **no `\appendix` section**, so you cannot use `see Appendix X` pointers (reviewers will flag a dead reference). Two options for excess content:
+
+| Content type | Where it goes |
+|---|---|
+| Hyperparameters, optimizer config, augmentation lists | Code release (`available at \url{...}`, anonymized for blind review) |
+| Full algorithm details | Compress into Algorithm 1 box inline; cut decorative steps |
+| Extended results, ablations | Supplementary video (for behavior) or omit entirely; reviewers know the venue is tight |
+| Proofs | If the proof is non-trivial, cite a tech report (`Proof in our companion arXiv preprint at \url{...}`). If short, inline it |
+| Hardware / compute | Compress to ONE inline sentence per Step 9b |
+
+**Rule (no-appendix venues)**: compress, do not relegate. Every claim must survive in the main body or in an external pointer (code repo, project page, separate supplementary PDF if the venue accepts one). NEVER write a `see Appendix X` pointer that resolves nowhere.
+
+See SKILL.md rule 17 for the venue list and the config-dump anti-pattern.
 
 ---
 

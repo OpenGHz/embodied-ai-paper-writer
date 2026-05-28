@@ -63,7 +63,24 @@ Use exactly one of: `We propose`, `We introduce`, `We present`, `We show`, `We d
 
 ### Move 4 — Method gist (2–4 sentences)
 
-Walk the mechanism in input→processing→output order. Keep formalism out of the abstract. Use simple verbs: `Our method consists of...`, `The model takes {input} and produces {output}.`, `We train via {paradigm}.`
+Walk the mechanism in **input→processing→output** order. Keep formalism out of the abstract. Use simple verbs: `Our method consists of...`, `The model takes {input} and produces {output}.`, `We train via {paradigm}.`
+
+**Stop at the level of "what comes out", not "how the loop commits".** Abstract readers (including reviewers skimming arXiv listings) need the mechanism's *outcome shape*, not its *internal control flow*. The following are training-loop-internal terms and **do not belong in the abstract**:
+
+| Method-internal term (avoid in abstract) | Why it's too detailed |
+|---|---|
+| `committed only after a held-out training-group gate` | Gate / commit / training-group are Stage-1 internals |
+| `converges after N iterations` | Convergence criterion |
+| `trained for N epochs with early stopping at validation loss X` | Optimizer details |
+| `the K-group gate at threshold 0.85` | Hyperparameter exposure |
+| `each candidate is revised on failure and committed on gate pass` | Loop-iteration mechanics |
+| `we cache the prompt and reuse the lookup table at inference` | Implementation plumbing |
+
+**Fix**: state the *artifact* the loop produces, not the criterion for producing it.
+- ✗ `... distills the discovery into a one-line \addprompt{} committed only after a held-out training-group gate.`
+- ✓ `... distills the discovery into a one-line \addprompt{}.` (the loop's commit criterion is method-section material)
+
+**Calibration test**: read your method-gist sentence aloud as if to a reader who has never opened the paper. If a term requires the reader to picture the training loop's control flow to interpret, move it to the Method section.
 
 ### Move 5 — Results (delta-form, late in the abstract)
 
@@ -206,6 +223,7 @@ End the intro with an organization paragraph if (a) venue is IEEE-style, (b) pap
 | **Hyperbole adjectives** | Strip them: `Novel`, `New`, `Optimal`, `Best`, `Definitive` | Keep | drop or replace |
 | **Numbers in abstract** | Deltas (`+12% over X`) or as-of claims (`SOTA on three benchmarks`) | Absolutes (`87.3%`) without baseline |
 | **Cross-references** | None — abstract is self-contained | `(\S\ref{sec:X})`, `see Section 4`, `as in Fig. 2`, `Table 1 reports ...` |
+| **Method-internal jargon** | State the artifact: `distills into a one-line prompt`. State the I/O: `takes video + proprio, outputs an action chain`. | `committed only after a held-out training-group gate`, `converges after N iterations`, `trained for N epochs with early stopping`, `the K-group gate at threshold 0.85`, `each candidate is revised on failure`. Training-loop internals belong in Method, not Abstract. |
 
 **Why no cross-refs in the abstract**: the abstract is read in isolation — in arXiv listings, search results, program books, citation indexes. A `\S\ref{sec:supervised_baselines}` renders as "§ 4.4" (or worse, "§ ??" if compilation fails) to a reader who has never opened the PDF. Body-anchored references inside the abstract are noise to ~80% of the readership. The single exception: a project-page or release URL in the optional Move 6 coda is fine because the URL resolves anywhere; section/figure refs do not.
 
@@ -245,6 +263,7 @@ Section 2's first paragraph opens with a **topical subheading** (bold, ending wi
 | "My abstract has no 'However' hinge" | Insert an explicit pivot sentence at Move 2 |
 | "My abstract has no numeric results" | Add delta-form results (Move 5) or replace with moral close (Move 6′) |
 | "My abstract references a section / figure / table" | Delete the `\ref` — the abstract must be self-contained for off-paper readers (arXiv listings, search snippets). Body-pointers belong in the Intro. |
+| "My abstract uses `gate` / `epoch` / `converges` / `commits` / training-loop verbs" | Move that to the Method section. Abstract method-gist stops at the artifact's I/O shape, not the loop's control flow. See Move 4 method-internal table above. |
 | "My intro is 7+ paragraphs" | Compress prior-work survey; move detail to Related Work section |
 | "Where do I put 'Our contributions'?" | Last paragraph of intro, bulleted/numbered |
 | "Should I include a roadmap paragraph?" | Only for IEEE-style venues OR theory papers with unusual section order |

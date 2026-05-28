@@ -219,19 +219,113 @@ Step 2: Read each drafted section through 4 lenses
   → Tense correctness: Abstract present, Conclusion past?
   → Figure/table coupling: are all main-text figures referenced?
 
-Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + standing rules)
-  → Abstract self-containment: grep abstract for `\ref`, `\autoref`, `\Cref`,
-    `Section `, `Fig.`, `Table ` — flag every hit (rule 14).
+Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + 17 + 18 + 19 + 20 + 21 + 22 + standing rules)
+  **Preferred path**: invoke the tool that automates these sweeps:
+    `<skill-dir>/tools/audit_conventions.sh --strict`
+  Run from the paper directory (with main.tex). The tool follows every
+  `\input{...}` (including symlinked figure dirs via `find -L`), so it
+  catches drift in `sections/*.tex`, `figures/*.tex`, `figures/*/*.tex`,
+  and any other `\input`'d file. It auto-loads `audit_conventions.conf`
+  from the paper dir if present (per-paper config for project-specific
+  old labels, system names, scope-tag modifiers). See
+  `tools/audit_conventions.example.conf` for the schema. Run
+  `audit_conventions.sh --list` to list available sweeps.
+
+  **Why automation matters**: manual grep over `sections/*.tex` only
+  systematically misses figure/table captions in `figures/*.tex` —
+  this happened to us and a reviewer would have flagged it. The tool's
+  recursive `\input` discovery is the only robust way to enumerate
+  everything the build pulls in.
+
+  **Manual fallback** (if the tool is unavailable, or to spot-check a
+  specific sweep):
+  → Abstract self-containment + method-internal jargon: grep abstract for
+    (a) `\ref`, `\autoref`, `\Cref`, `Section `, `Fig.`, `Table ` (rule 14
+    — body-anchored cross-references); (b) `gate`, `commit`, `converge`,
+    `epoch`, `early stopping`, `iteration` (training-loop control flow),
+    plus the paper's specific hyperparameter names (e.g., `K=3`, `0.85`)
+    that should live in Method, not Abstract. Flag every hit
+    (abstract-intro-playbook.md Move 4 method-internal table).
   → Related-Work bucket-header audit: list every `\paragraph{...}` /
     `\subsection{...}` header in Related Work. Check each is (a) a pure noun
     phrase, (b) names the research class (not I/O, not technique, not a
     sentence with verb), (c) shares no redundant tail with other headers,
     (d) case-consistent with the other headers (rule 15).
+  → Table-jargon-in-prose audit: grep Abstract / Intro / Method (conceptual
+    paragraphs) / Conclusion / Limitations for `\brow\b`, `\brows\b`,
+    `\bcolumn\b`, `\bcell\b`. Each hit MUST sit in a sentence that cites a
+    table or figure in the same or immediately prior sentence; otherwise
+    replace with `baseline` / `condition` / `setting` / `variant` (rule 16).
+  → Config-dump-in-main-body audit (venue-gated, rule 17):
+      (a) Confirm venue. If CoRL / RSS / NeurIPS / ICML / ICLR / Science
+          Robotics → in-PDF appendix allowed. If ICRA / IROS / RA-L / T-RO →
+          no in-PDF appendix.
+      (b) Scan Method / Experimental Setup / Results for inline parentheticals
+          listing hardware SKUs (`H200`, `A100`, `RTX`, `Jetson`), precision
+          flags (`bfloat16`, `fp16`, `int8`), token caps (`new-token`,
+          `context length`), learning rates (`2e-5`, `lr=`), batch sizes
+          (`batch size`), control rates (`Hz`), random seeds.
+      (c) For appendix-supporting venues: each hit becomes a pointer
+          (`see Appendix~\ref{app:X}`); the full dense paragraph moves to
+          the appendix.
+      (d) For no-appendix venues: hits stay inline but compress to ONE
+          tight sentence per category, or move to a `(code release at <url>)`
+          pointer.
+      (e) Flag any `see Appendix X` pointer in a no-appendix-venue paper —
+          that's a dead reference.
+  → Paired-condition-label-axis audit (rule 18): list every distinct label
+    the paper uses for its main experimental conditions (e.g., `iteration row`,
+    `no-prompt baseline`, `Ours`, `naked-modality`, `with X`, `without X`).
+    For each comparison pair, ask: are the two labels on the same naming axis?
+    If `Ours` partners with `Naked-Modality Baseline`, or `Iteration Row`
+    partners with `No-Prompt Baseline`, rewrite both to share one axis
+    (typically `{Adjective}-{condition} {ModelClass}` for an input-axis pair).
+    Verify the canonical pair is used identically across Abstract / Intro /
+    Method / Results / Conclusion (no drift to `our system` mid-paper).
+  → Writing-process-archaeology audit (rule 19): scan appendix and footnotes
+    for paragraphs describing dropped baselines, superseded comparators,
+    internal experiment codenames (`E02`, `Phase 1`, `Attempt 001`), or
+    candidate-Δ-that-was-changed explanations. These should be deleted; if
+    the choice-of-baseline justification is needed, compress to ONE sentence
+    in the main-body Baselines paragraph. If load-bearing, promote to a
+    proper named ablation subsection + table — never an apologetic appendix
+    paragraph.
+  → Load-bearing-modifier audit (rule 20): identify the scope-tag modifiers
+    the paper introduces in Problem Setup / Abstract / Intro (e.g.,
+    `successful`, `exploratory`, `held-out`, `task-keyed`, `frozen`,
+    `naked-modality`, `minimal-success`). For each, grep the rest of the
+    paper for occurrences. The first definition site keeps the modifier;
+    every subsequent occurrence outside a local-adjective use should drop it
+    (`the exploratory trace` → `the trace`; `the held-out groups` → `the
+    test groups`). Flag stacked redundancies like `successful exploratory`
+    or `held-out test` when the second word already implies the first.
+  → Concept-vs-instantiation audit (rule 21): identify any instantiation
+    noun the paper might be leaking into conceptual framing positions
+    (e.g., `demo`/`demos`/`demonstration` when the framework-level concept
+    is `trace`; `controller` when the concept is `policy`; `trial` when the
+    concept is `episode`). The `vocab-lock` sweep in
+    `tools/audit_conventions.sh` (config field `VOCAB_LOCK_PATTERNS`) is
+    the operational tool — every hit is listed for manual verification;
+    the source-disclosure site (typically Experiments / Appendix dataset
+    section) is expected to appear and is legitimate, but any occurrence in
+    Abstract / Intro / Method / Results / Conclusion framing positions
+    should be replaced with the conceptual noun.
+  → New-task naming audit (rule 22): if the paper proposes a new QA task /
+    benchmark / evaluation formulation, verify it has a named abbreviation
+    with full expansion on first mention in Abstract, Intro, and Method.
+    Grep for generic descriptors that signal an unnamed task: `\bour QA\b`,
+    `\bthe QA task\b`, `\bour task\b`, `procedural[ -]?QA`, `manipulation
+    reasoning task`. Each hit indicates the paper is leaning on a generic
+    handle where a proper name is needed. Also verify: the abbreviation
+    appears in `\keywords{...}`; the task name is consistent across
+    Abstract / Intro / Method / figure & table captions / appendix; the
+    `vocab-lock` config locks any legacy descriptors used in earlier
+    drafts (e.g., `procedural-QA`) to prevent regression.
   → Teaser reference: grep Intro for `Figure 1` / `Fig. 1` / `\ref{fig:teaser}`
     — must appear in ¶1 or ¶2 (rule 7).
   → Limitation pairing: every `\textbf{...}` / `**...**` limitation label
     must have a `Future work could ...` sentence in the same paragraph (rule 8).
-  These four sweeps catch the high-frequency, low-effort misses that the
+  These eleven sweeps catch the high-frequency, low-effort misses that the
   4-lens scan tends to skip.
 
 Step 3: Report the arc-level findings
@@ -314,7 +408,7 @@ Step 5: Prioritize fixes
 
 14. **Abstract is self-contained — no body-anchored cross-references**.
     - The abstract appears in isolation (arXiv listings, search snippets, program books, citation indexes). `\S\ref{sec:X}`, `see Section 4`, `as in Fig. 2`, `Table 1 reports ...` render as noise or as "§ ??" to readers who haven't opened the PDF.
-    - Allowed in abstract: numbers, named comparators, system name, dataset/model names, project URL in Move 6 coda.
+    - Allowed in abstract: numbers, named baselines, system name, dataset/model names, project URL in Move 6 coda.
     - Forbidden in abstract: any `\ref` / `\autoref` / `\Cref` to a section, figure, table, or equation in the body. Re-state the content; do not point at it.
     - When reviewing, grep abstract for `\ref`, `\autoref`, `\Cref`, `Section `, `Fig.`, `Table ` and flag every hit.
 
@@ -323,6 +417,103 @@ Step 5: Prioritize fixes
     - Compute the longest common suffix across headers. If it's more than one word, that's the paper's universal scope — drop it from every header (it's implicit). Example: four headers ending in `... on Manipulation Traces` → drop the suffix; the section heading already establishes the domain.
     - Pick Title Case OR sentence-case and apply to **every** header in the section. Mixed case is a tell.
     - See method-relatedwork-playbook.md Step 2 for the full anti-pattern table.
+
+16. **No table jargon (`row`, `column`, `cell`) in prose contexts**.
+    - `row` / `column` / `cell` force the reader to picture a table that isn't on the page. They are legitimate only when the current paragraph just cited a specific table or figure (`Table~\ref{tab:X}` / `Fig.~\ref{fig:Y}` in the same or immediately prior sentence).
+    - In **prose contexts** — Abstract, Introduction, Method conceptual paragraphs, Conclusion, Limitations — replace table jargon with experiment-condition vocabulary: `baseline`, `condition`, `setting`, `variant`, `system`. Specifically:
+      - `no-prompt row` / `baseline row` → `no-prompt baseline` (drop redundant "row" — "baseline" already names the role)
+      - `iteration row` / `our row` → `iteration condition` / `our system` / `{SystemName}`
+      - `the X row from the modality ablation` → `the X baseline` (the table reference belongs in the cite, not the noun)
+    - In **table-anchored contexts** — Results/Ablations paragraphs that just cited `Table~\ref{...}` or `Figure~\ref{...}` — `row` is fine and even preferred for precise reference (`row 8 (video + proprio)`, `the iteration row clears 0.93`).
+    - When reviewing, grep prose-context files for `\brow\b`, `\brows\b`, `\bcolumn\b`, `\bcell\b`. Each hit must either sit inside a table-anchored sentence (one cite in the same or prior sentence) or be replaced.
+
+17. **Config-parameter relegation is venue-gated**.
+    - "Config-parameter dump" = hardware SKU, precision flags, token caps, batch sizes, optimizer hyperparameters, control rates, learning-rate schedules, random seeds — the stuff that doesn't change the paper's argument but is needed for reproducibility.
+    - **Venues that support an in-PDF appendix (`\appendix` in the same compiled PDF)** — CoRL, RSS, NeurIPS, ICML, ICLR, AAAI, Science Robotics (Supplementary Materials), Nature Robotics (Methods + Extended Data): aggressively relegate. Main body keeps **only the pointer** (`hardware, precision, and token caps are in Appendix~\ref{app:identifiers}`); appendix carries the dense paragraph. Each main-text inline config detail you keep eats line budget that should go to argument.
+    - **Venues with strict page limit and no in-PDF appendix** — IEEE RA-L (8 pages incl. refs), IEEE T-RO (limited supplementary), ICRA standard track, IROS, most IEEE Letters: cannot relegate to an in-PDF appendix because there isn't one. Either (a) keep the config compressed inline in one tight sentence, or (b) point to a separate supplementary PDF / code release (`full hyperparameters in the code release at <url>` / `see supplementary PDF`). DO NOT write `see Appendix X` if your venue does not allow `\appendix` — reviewers will flag a dead pointer.
+    - **When in doubt**: read the venue's CFP for "supplementary materials" / "appendix" guidance. CoRL/RSS default = aggressive relegation. ICRA/IROS default = inline compression + code-release pointer.
+    - See experiments-results-playbook.md Step 9 (hardware paragraph) and method-relatedwork-playbook.md Step 10 (appendix-relegation) for drafting guidance under each regime.
+
+18. **Paired condition labels must share a naming axis**.
+    - Whenever the paper compares two experimental conditions to each other (treatment vs. control, ablation vs. full, ours vs. baseline), the two labels must be on the **same naming axis** — so the reader sees the pair as a pair, not as two unrelated nouns.
+    - **Same-axis examples (good)**:
+      - `Distilled-Prompt VLM` vs. `Naked-Modality VLM` — axis = "what input the VLM gets" (`{Adjective}-{input-condition} VLM` template)
+      - `With pretraining` vs. `Without pretraining` — axis = "ablation flag"
+      - `Ours (RL)` vs. `Ours (BC)` — axis = "training paradigm"
+      - `OpenVLA-7B` vs. `OpenVLA-13B` — axis = "scale"
+    - **Mixed-axis anti-patterns (bad)**:
+      - `Iteration row` vs. `No-prompt baseline` — one names a table position (`row`), the other names an experimental role (`baseline`); reader cannot tell they are the same pair
+      - `Ours` vs. `Best naked-modality` — `Ours` is an authorship marker, `Best naked-modality` is a content descriptor
+      - `With distilled prompt` vs. `Raw VLM` — one names the input intervention, the other names the model class
+    - When reviewing, list the labels of every condition the paper compares. For each pair, ask: "Are these two labels on the same axis?" If not, rewrite both to share one axis.
+    - When the label drifts (e.g., `iteration row` in §4, `iteration condition` in §3, `our system` in §1), lock to one canonical pair across the whole paper — first/last mention identical to middle mention.
+    - See language-phrasebank.md Section J for axis-aligned substitution candidates.
+
+19. **No "writing-process archaeology" in main body or appendix**.
+    - "Writing-process archaeology" = paragraphs that describe how the paper's setup or claims evolved during drafting: dropped baselines, internal experiment codenames (`E02`, `Phase 1`, `Attempt 001`), candidate Δs that were superseded, justifications for why a comparator was changed from one to another.
+    - These read as the author talking to themselves, not to the reader. Reviewers infer cherry-picking ("if you considered other baselines, why did you settle on these?"). Even when the choice is defensible, the archaeology paragraph creates the question.
+    - **Fix**: state the baseline's positive identity in the main-body Baselines paragraph and stop there. The baseline's own definition does the anti-cherry-picking work:
+      - ✓ `The Naked-Modality VLM is the strongest of {video, proprio, video+proprio} rows from the modality ablation (Table~X); the chain prompt and evaluation cap are identical to the Distilled-Prompt VLM.`
+      - ✗ `... we considered several candidates and chose the most conservative one.` ← softer archaeology; still triggers "which candidates?"
+      - ✗ `... originally we used X but switched to Y for fairness.` ← explicit archaeology
+    - **Subtractive principle**: the cleanest defense against "you cherry-picked" is to define the baseline as the *maximum* over a named set (e.g., `strongest of {...}`, `best across modalities`). The reader sees the upper-bound construction and the question dissolves — without you having to comment on the construction.
+    - No numbers from dropped baselines. No internal codenames. No "originally we used X but switched to Y" / "the most conservative of the candidates we considered" explanations — both forms trigger the same suspicion.
+    - If the dropped-baseline information is load-bearing for the argument (e.g., showing robustness across baseline choices), promote it to a full ablation **with a proper subsection name and table**, not a hidden paragraph in the appendix.
+    - See closing-appendix-playbook.md anti-patterns for the appendix-specific framing.
+
+20. **Lock load-bearing modifiers, then drop them outside the definition**.
+    - Many embodied-AI papers introduce a *modifier* that scopes the contribution: `successful` exploratory trace, `held-out` test groups, `task-keyed` prompt entry, `frozen` base VLM, `naked-modality` baseline, `minimal-success` action chain. Each such modifier is **load-bearing once** — at the place where the term is first defined or scoped — and then becomes wallpaper if repeated.
+    - **Rule**: define the modifier exactly once (in Problem Setup / first introduction / Abstract), then drop it from every subsequent reference. The reader carries the modifier mentally; repeating it implies the author is afraid the reader will forget.
+    - **Example (the `successful exploratory trace` case)**:
+      - ✓ §3.1 Problem Setup: `We consider procedural reasoning over a successful exploratory manipulation trace ...` (definition; modifier carried by the reader)
+      - ✓ §2/§4/§5/§7: `the exploratory trace`, `the trace`, `this trace` (modifier dropped — already in the reader's mental model)
+      - ✗ §2 ¶1: `In contrast, we frame chain prediction over a successful exploratory trace ...` (redundant repetition)
+      - ✗ §2 ¶2: `in a successful trace, the same first pull-failure is signal that ...` (the modifier is doing no new work here)
+    - **Watch for stacked redundancy**: `the successful exploratory trace's probe segment` triple-loads `successful` + `exploratory` + `'s probe`. After the first definition, drop both `successful` and `exploratory` — `the trace's probe segment` is unambiguous.
+    - **Exception**: when the modifier carries a *local* meaning (e.g., `the second, successful pull` describing the second drawer-pull attempt that succeeded after the first failed), keep it — here `successful` modifies `pull`, not the framework-level concept. The rule is about modifier-as-framework-scope-tag, not modifier-as-local-adjective.
+    - When reviewing, grep prose for the load-bearing modifiers the paper introduces. Count occurrences. If a modifier appears in 3+ places outside its definition site, flag every redundant repetition.
+    - This is the modifier analog of rule 2 (lock the contribution noun phrase): rule 2 keeps the *system name* identical across re-mentions; rule 20 keeps the *scope-tag modifier* in one place only.
+
+21. **Lock the type-general noun; isolate the concrete instantiation to a source-disclosure site**.
+    - For each data object the paper reasons about, pick the **most type-general noun** that names what the object *is* (a stream / a record / a measurement), not what it *came from* (a demonstration / a rollout / a replay buffer / a teleop session). Use that conceptual noun everywhere — Abstract, Intro, Method, Results, Conclusion — and reveal the concrete instantiation only at the source-disclosure site (typically Experiments setup or Appendix dataset section).
+    - **Why**: instantiation-named nouns lock the contribution to one data regime. If the paper writes "iterates on demos" throughout, reviewers infer the method requires demonstrations and won't work on inference logs, replay-buffer entries, or live recordings — even when nothing in the method actually depends on the data being a demonstration. The conceptual noun keeps the contribution portable across sources.
+    - **Example (the `trace` vs `demonstration` case)**:
+      - ✓ Abstract: `iterates on traces with access to ground-truth chain labels`
+      - ✓ Intro / Method / Results / Conclusion: `the task's traces`, `the agent reads the trace input`, `each trace`
+      - ✓ Appendix `app:datasets`: `Each trace in this paper is a recorded demonstration (simulator: AdaManip rollout; real-robot: human teleoperation). The framework treats trace as a generic data type and is not demonstration-specific: alternative sources such as model inference logs or replay-buffer entries could compose unchanged.`
+      - ✗ Abstract: `iterates on demos` (instantiation noun in conceptual framing position)
+      - ✗ Method figure caption: `iterates on the task's demo data` (same — demo-bound framing)
+    - **Other common concept/instantiation pairs in embodied-AI**:
+
+      | Concept noun (use throughout) | Concrete instantiation (only at source-disclosure) |
+      |---|---|
+      | `trace` / `trajectory` | `demonstration`, `rollout`, `replay-buffer entry`, `teleop session`, `inference log` |
+      | `policy` / `controller` | `transformer policy`, `diffusion policy`, `MLP controller` |
+      | `episode` | `trial`, `attempt`, `run`, `recording` |
+      | `observation` | `RGB frame`, `point cloud`, `joint encoder reading` |
+      | `dataset` | `OpenX subset`, `BridgeData V2`, `our 60-demo collection` |
+      | `reward signal` | `sparse +1`, `shaped potential`, `LLM-judged scalar` |
+      | `latent` | `bottleneck`, `embedding`, `VAE z` |
+
+    - **Exception (mirrors rule 20's local-adjective exception)**: when the instantiation noun appears at the source-disclosure site itself, or in a sentence whose specific purpose is naming the implementation (`we use the Unitree A1 robot`, `60 demonstrations collected on physical hardware`), keep it. The rule is about leakage of instantiation framing into the conceptual layer, not about banning the word.
+    - **Detection**: the `vocab-lock` sweep in `tools/audit_conventions.sh` (config field `VOCAB_LOCK_PATTERNS`) is the operational tool. Add the instantiation noun(s) the paper should not leak into conceptual framing (e.g., `\bdemo\b`, `\bdemos\b`, `\bcontroller\b`); the sweep lists every occurrence for manual verification. The source-disclosure site will appear in the list — that's expected; the auditor's job is to surface, the reviewer's job is to verify each hit is legitimately at a disclosure site, not at a framing site.
+    - This is the **noun analog** of rule 20 (which is about modifier-level scope tags). Rule 20 controls *adjective* leakage; rule 21 controls *noun* leakage. Together they form the "lock the abstraction layer; isolate concretizations to disclosure sites" pattern.
+
+22. **A proposed new task must have a named abbreviation, defined once and locked everywhere**.
+    - When the paper proposes a **new QA task / benchmark / evaluation formulation** (not just a new method on an existing task), the task **must** have a named abbreviation. Generic descriptors like `procedural QA`, `manipulation reasoning task`, `our QA task` are not citable, not memorable, and reviewers will not retain them. Named tasks survive in citation graphs; generic descriptors do not.
+    - **Corpus naming pattern**: `{Domain}-QA` / `{Domain}-Bench` / `{Domain}Bench`. Examples reviewers expect to recognize: VQA, RoboVQA, ManipBench, EgoPlan-Bench2, OpenX, R2D2-VQA, HARMONIC-MM. The abbreviation expands to a noun phrase that reads naturally in the title and section openers.
+    - **First-mention convention**: introduce the task with `{Full Expansion} ({Abbreviation})` exactly once per major section (Abstract, Intro ¶3, Method §3.1 / Problem Setup). After first mention in each section, use the abbreviation only.
+    - **Definition site**: the formal definition (input → output → metric) lives in Method's Problem Setup subsection. The Abstract and Intro use the abbreviation + a one-line gloss ("the task of predicting the minimal-success action chain that explains a trace"); the Method section gives the full I/O spec.
+    - **Example (the EMT-QA case)**:
+      - ✓ Abstract S2: `... pipeline for *Exploratory Manipulation Trace QA* (EMT-QA): ...`
+      - ✓ Intro ¶3: `... pipeline for *Exploratory Manipulation Trace QA* (EMT-QA), the task of predicting the minimal-success action chain that explains an exploratory manipulation trace.`
+      - ✓ Method §3.1: `We introduce *Exploratory Manipulation Trace QA* (EMT-QA), a chain-prediction task over a successful exploratory manipulation trace. Given a synchronized stream of (i) ..., (ii) ..., (iii) ..., the system must output the *minimal-success action chain* ...`
+      - ✓ §4/§5/§6/§7/Appendix: `EMT-QA chain accuracy`, `the EMT-QA target strings`, `the EMT-QA chain question`, `EMT-QA artifacts`
+      - ✗ Anywhere: `procedural-QA`, `procedural multimodal QA`, `our QA task`, `the QA we propose` (generic descriptors with no abbreviation — reviewers won't remember or cite this)
+    - **Title alignment** (optional but strong): if the task is a primary contribution, the title should signal the task domain. The expansion noun phrase should be parseable from the title without the abbreviation (`... for Exploratory Manipulation Trace QA` is fine; `... for EMT-QA` in a title is not — title readers don't have the expansion yet).
+    - **Keywords entry**: the abbreviation belongs in the `\keywords{...}` list alongside the method name and domain (e.g., `EMT-QA, exploratory manipulation, prompt distillation`).
+    - **Detection**: when reviewing, grep the paper for `\bQA\b` / `\bbenchmark\b` / `\btask\b` in framing positions (Abstract, Intro, Method opener). If the paper reaches for a generic descriptor where a proper name should be, flag it. The `vocab-lock` sweep can also lock legacy generic descriptors (`procedural-QA`, `our task`) once the proper name is chosen, preventing regression.
+    - **Sibling to rule 2** (lock contribution noun phrase). Rule 2 locks the *system name* (`Closed-Loop Trace Distillation`); rule 22 locks the *task name* (`EMT-QA`). A paper that proposes a method + a task + a trained artifact needs all three names locked independently. Worked example of a fully-named triad: **EMT-QA** (task, rule 22) × **Closed-Loop Trace Distillation** (method, rule 2) × **Distilled Reading Heuristic / DRH** (artifact, rule 2 — same locking discipline as system names). Picking same-root abbreviations across the triad (here `Distill-` shared by method and artifact) makes the contribution scannable as a single citation entity.
 
 ---
 

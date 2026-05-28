@@ -152,7 +152,7 @@ Templates:
 
 Pair C4+C3 as the standard refrain: "Prior work X is limited because Y. Unlike these works, we Z."
 
-### C5. "Recent work has shown" (citing as evidence, not as comparator)
+### C5. "Recent work has shown" (citing as evidence, not as baseline)
 Templates:
 - `Recent work has shown that [CLAIM] [CITES].`
 - `[CITES] [demonstrate / show] that [CLAIM].`
@@ -448,6 +448,11 @@ Overuse of hedges reads as evasive; absence reads as overclaiming. Aim for hedge
 | Many | (give the number, or "5+") |
 | Outperforms | (specify by how much, absolute or relative) |
 | State-of-the-art | (cite the prior best) |
+| **`comparator` / `comparators`** | `baseline` / `baselines` (corpus convention; `comparator` is virtually absent from CoRL/RSS/ICRA/IROS) |
+| **`comparative method`** | `baseline` |
+| **`X row` in prose** (no table cited) | `X baseline` / `X condition` / `X setting` / `X variant` (see Section K and SKILL.md rule 16) |
+| **`baseline row`** | `baseline` (drop redundant "row") |
+| **`X column` in prose** (no table cited) | `X metric` / `X axis` / `X dimension` |
 
 **Test**: if you delete the adjective, does the sentence say less? If not, delete it.
 
@@ -466,6 +471,14 @@ Overuse of hedges reads as evasive; absence reads as overclaiming. Aim for hedge
 | `We achieve impressive results.` | Replace "impressive" with the number. |
 | `The result is significant.` | Replace "significant" with the delta and (if applicable) p-value. |
 | Stacked weak adjectives: `a novel, robust, scalable, end-to-end pipeline` | Pick the strongest one. |
+| **Table jargon in prose** — `iteration row` / `no-prompt row` / `baseline row` in Abstract, Intro, Method conceptual paragraphs, Conclusion, or Limitations (no table cited in same/prior sentence) | Replace with experiment-condition vocabulary: `iteration condition`, `no-prompt baseline` (drop redundant "row"), `our system`. Keep `row` only in Results/Ablations paragraphs that just cited `Table~\ref{...}` or `Figure~\ref{...}`. Same rule for `column` / `cell`. |
+| **Config dump in main body** — inline parenthetical listing hardware SKUs (`single H200, bfloat16; 2048 new-token cap for text-only rows, 4096 for video-bearing rows`), optimizer hyperparameters, token caps, control rates | **Venue-dependent fix (SKILL.md rule 17)**. (a) CoRL / RSS / NeurIPS / ICML / Science Robotics → relegate to in-PDF appendix; main body keeps a 1-line pointer (`hardware, precision, and token caps are in Appendix~\ref{app:hardware}`). (b) ICRA / IROS / RA-L / T-RO → cannot relegate to in-PDF appendix (it doesn't exist); compress to ONE inline sentence per category, or point to code release (`full hyperparameters in the code release at \url{...}`). NEVER write `see Appendix X` if the venue has no `\appendix`. |
+| **Dead `see Appendix X` pointer at a no-appendix venue** | Either move the content inline (compressed) or point to code release / supplementary video. Reviewers flag pointers that resolve nowhere. |
+| **Mixed-axis paired condition labels** — pair like `Iteration row` vs. `No-prompt baseline`, `Ours` vs. `Naked-Modality Baseline`, `With X` vs. `Raw VLM` (one names a table position / authorship / model class, the other names an experimental role / content descriptor / input intervention) | Rewrite both labels to share the same naming axis. For input-axis pairs use `{Adjective}-{condition} {ModelClass}` (e.g., `Distilled-Prompt VLM` vs. `Naked-Modality VLM`). Lock the canonical pair across the whole paper — no drift to `our system` mid-paper. See SKILL.md rule 18. |
+| **Writing-process archaeology in appendix** — paragraphs reporting dropped baselines, internal codenames, superseded Δs, "originally we used X but switched to Y", **or even softer hedges like "the most conservative of the candidates we considered"** | Delete the paragraph. In the main-body Baselines paragraph, define the baseline as the *maximum over a named set* (e.g., `strongest of {video, proprio, video+proprio}` rows) — the upper-bound construction IS the anti-cherry-picking signal, no commentary needed. See SKILL.md rule 19 and closing-appendix-playbook.md anti-patterns. |
+| **Repeating a load-bearing scope-tag modifier outside its definition** — `successful exploratory trace` appears in §2/§4/§5/§7 after being defined in §3.1; `held-out test groups` repeated when `test groups` already implies held-out; `frozen base VLM` repeated when context already locked "frozen" earlier | Define the modifier once at the scope-setting site (Problem Setup / Abstract / first introduction) and drop it from every subsequent reference. The reader carries it mentally. Exception: when the modifier carries a *local* adjective meaning (`the second, successful pull` = the attempt that succeeded), keep it. See SKILL.md rule 20. |
+| **Leaking an instantiation noun into conceptual framing positions** — `iterates on demos` in Abstract / Intro / Method when the framework-level concept is `trace`; `controller` used in framing positions when the concept is `policy`; `trial` when the concept is `episode` | Use the type-general concept noun (`trace`, `policy`, `episode`, `observation`) everywhere — Abstract, Intro, Method, Results, Conclusion. Disclose the concrete instantiation (`demonstration`, `transformer policy`, `attempt`, `RGB frame`) only at the source-disclosure site (Experiments setup or Appendix dataset section), with a one-line note clarifying the framework is not instantiation-bound. See SKILL.md rule 21. Operational sweep: `vocab-lock` in `tools/audit_conventions.sh`. |
+| **Unnamed new task** — `procedural QA`, `procedural multimodal QA`, `our QA task`, `the QA we propose`, `manipulation reasoning task` used as the contribution's handle in Abstract / Intro / Method | Coin a **named abbreviation** following the corpus pattern `{Domain}-QA` / `{Domain}-Bench` (e.g., `EMT-QA = Exploratory Manipulation Trace QA`, cf. RoboVQA / ManipBench / EgoPlan-Bench2). Introduce as `{Full Expansion} ({Abbreviation})` at first mention in each major section (Abstract, Intro, Method); use the abbreviation only thereafter. Formalize the I/O definition in Method's Problem Setup. Add the abbreviation to `\keywords{...}`. See SKILL.md rule 22. |
 
 ---
 
@@ -482,8 +495,16 @@ Overuse of hedges reads as evasive; absence reads as overclaiming. Aim for hedge
 | "How do I set up my method section?" | D1–D5 |
 | "How do I describe an equation / variable?" | D4 |
 | "How do I report a result?" | E1–E5 (the 4-step paragraph) |
-| "How do I report a number with no comparator?" | E3 — always pair with delta |
+| "How do I report a number with no baseline?" | E3 — always pair with delta |
 | "How do I close an ablation paragraph?" | F3 |
 | "How do I write limitations?" | G1–G4 |
 | "Which connector should I use?" | H1 table |
 | "Is `novel` / `significant` weak?" | J — yes, replace with the measurable |
+| "Is `comparator` OK in CoRL?" | J — no, use `baseline` / `baselines` |
+| "Is `iteration row` / `no-prompt row` OK in prose?" | J + K — only if a table or figure was cited in the same/prior sentence; otherwise use `condition` / `baseline` / `setting` |
+| "Where do hardware / hyperparameter config dumps go?" | K + SKILL.md rule 17 — venue-gated: CoRL/RSS/NeurIPS → appendix; ICRA/IROS/RA-L/T-RO → inline-compressed or code-release pointer |
+| "Are my treatment / baseline labels well-named?" | K + SKILL.md rule 18 — paired labels must share a naming axis (`Distilled-Prompt VLM` vs. `Naked-Modality VLM`, NOT `Iteration row` vs. `No-prompt baseline`) |
+| "Should I keep this paragraph explaining how I changed my baseline?" | K + SKILL.md rule 19 — no, delete it; compress to one inline sentence in main-body Baselines or promote to a proper ablation. Writing-process archaeology in appendix reads as cherry-picking |
+| "Should I repeat `successful` / `frozen` / `held-out` every time?" | K + SKILL.md rule 20 — no, lock the modifier once at its definition site and drop everywhere else. The reader carries the scope tag mentally |
+| "Should I write `demo` / `demonstration` throughout the paper?" | K + SKILL.md rule 21 — no, use the type-general concept noun (`trace`) throughout; disclose the concrete instantiation (`demonstration`) only at the source-disclosure site (Experiments / Appendix dataset section), and note the framework would equally consume other sources (inference logs, replay-buffer entries) |
+| "I'm proposing a new QA task — what do I call it?" | K + SKILL.md rule 22 — coin a named abbreviation following the `{Domain}-QA` / `{Domain}-Bench` corpus pattern (cf. RoboVQA / ManipBench / EgoPlan-Bench2); introduce with full expansion + abbreviation on first mention in each major section (Abstract / Intro / Method §3.1), then use the abbreviation only; add to keywords; never use a generic descriptor like `procedural QA` or `our QA task` as the contribution's handle |
