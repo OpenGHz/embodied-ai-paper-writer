@@ -1,31 +1,13 @@
 ---
 name: embodied-ai-paper-writer
 description: |
-  Professional embodied-AI paper-writing coach. Distilled from 63 top-conference
-  papers (CoRL, RSS, ICRA, IROS, Science Robotics, 2022–2026) covering writing
-  craft only — vocabulary, sentence patterns, paragraph flow, figure/table
-  conventions, section-by-section construction, rhetorical pivots, and appendix
-  norms. NOT a content advisor — this skill teaches HOW to write, not WHAT
-  to claim.
+  Professional embodied-AI paper-writing coach distilled from 63 top-conference papers (CoRL, RSS, ICRA, IROS, Science Robotics, 2022–2026). Teaches writing craft only — vocabulary, sentence patterns, paragraph flow, figure/table conventions, section-by-section construction, rhetorical pivots, appendix norms. NOT a content advisor: teaches HOW to write, not WHAT to claim.
 
-  Use when the user mentions: writing a paper, drafting a section (abstract,
-  intro, method, related work, experiments, results, ablations, figures,
-  tables, conclusion, limitations, future work, appendix), titling a paper,
-  reviewing a draft, fixing a section, captioning a figure, comparing baselines,
-  or asking how top embodied-AI papers structure something.
+  Use when the user mentions writing or reviewing any paper section (abstract, intro, method, related work, experiments, results, ablations, conclusion, limitations, appendix), titling, figure captioning, paragraph polishing, rebuttals, or submission prep.
 
-  Triggers in English: "write my abstract", "draft an intro", "title my paper",
-  "caption this figure", "how do top robotics papers do X", "review this
-  section", "fix my method", "polish this paragraph", "tighten this section",
-  "what should be in the appendix", "how do I present results", "limitations
-  section", "transition between paragraphs", "is this sentence right for a
-  CoRL paper", "help with my rebuttal", "respond to reviewer", "ready for
-  submission".
+  English cues: "write my abstract", "draft an intro", "title my paper", "caption this figure", "review this section", "fix my method", "polish this paragraph", "limitations section", "help with my rebuttal", "ready for submission".
 
-  Triggers in Chinese: 「帮我写摘要」「润色引言」「修改这段」「这个figure怎么标caption」
-  「我的method怎么组织」「这段experiments怎么写」「这个标题行不行」
-  「conclusion怎么收尾」「reviewer会怎么看」「rebuttal怎么写」「投稿前帮我看一下」
-  「这段话像不像顶会风格」.
+  Chinese cues: 「帮我写摘要」「润色引言」「修改这段」「figure怎么标caption」「method怎么组织」「experiments怎么写」「conclusion怎么收尾」「rebuttal怎么写」「投稿前帮我看一下」「像不像顶会风格」.
 ---
 
 # Embodied-AI Paper Writer · Writing-Craft Operating Manual
