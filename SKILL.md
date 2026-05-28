@@ -72,6 +72,22 @@ Match the user's request to a row, then read ONLY the listed reference file(s). 
 
 **When this skill activates, follow these rules. Different request types take different paths.**
 
+### Step 0 — Terminology alignment (applies to ALL scenarios below)
+
+Before writing or revising any content, confirm with the user the definitions and canonical spellings of key concepts, terms, and named entities that will appear in the paper. This ensures narrative consistency across sections.
+
+```
+→ List the key terms you've identified (system name, task name, method components,
+  baseline labels, dataset names, domain-specific nouns).
+→ For each, propose a canonical form (spelling, capitalization, hyphenation).
+→ Ask the user to confirm, correct, or add missing terms.
+→ Lock the confirmed terminology list — use these forms verbatim throughout.
+→ If the user has already provided a terminology list or the terms are obvious
+  from prior context, acknowledge and lock without re-asking.
+```
+
+This step feeds into Scenario A Step 3.5 (noun-phrase lock) and Universal Rule 2 (contribution noun phrase). It extends the same discipline to ALL named concepts, not just the system name.
+
 ### Scenario A — User wants to write a NEW section from scratch
 
 ```
