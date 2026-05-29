@@ -230,6 +230,7 @@ Vary the verbs to avoid monotony.
 | Verb | Strength | Use |
 |---|---|---|
 | **achieves** | Mid-strong, neutral | "achieves 75% success" — workhorse |
+| **reaches** | Mid, neutral | "reaches at least 0.93" — preferred over colloquial `clears` |
 | **outperforms** | Strong, comparative | "outperforms X by Y%" |
 | **improves over** | Strong, comparative | Like outperforms, slightly softer |
 | **surpasses** | Strong, formal | "surpasses chain-of-thought reasoning..." |
@@ -242,9 +243,12 @@ Vary the verbs to avoid monotony.
 
 Templates:
 - `[SYSTEM] achieves [METRIC] of [VALUE] [on / across] [TASKS].`
+- `[SYSTEM] reaches at least [VALUE] on every [task / split / condition].`
 - `[SYSTEM] outperforms [BASELINE] by [DELTA] (absolute / relative).`
 - `[SYSTEM] [improves / reduces] [METRIC] by [VALUE]% over [BASELINE].`
 - `[SYSTEM] establishes a new state of the art [on / for] [TASK].`
+
+**Colloquial-verb anti-pattern**: do NOT use `clears`, `tops`, `nails`, `crushes`, `beats out`, `blows past` for result reporting. These read as sports-commentary or blog voice, not academic claim. The fix is mechanical: `clears $\geq 0.93$` → `reaches at least $0.93$`; `tops the leaderboard` → `achieves the best score`; `crushes the baseline by 30%` → `outperforms the baseline by 30%`. Reserve emphatic phrasing for the table itself (bold), not the prose verbs.
 
 ### E3. Quantitative phrasings (deltas, units, hedges)
 
@@ -260,6 +264,17 @@ Templates:
 - `across [N] [seeds / trials / tasks / episodes]`
 
 **Always specify absolute vs. relative** explicitly. Confusing 16% absolute with 16% relative is a credibility-destroyer.
+
+**Decimal precision consistency across prose**: pick ONE decimal count for all numbers that appear in the prose of a given paper (abstract / intro / results paragraphs / conclusion) and use it everywhere. Two columns:
+- *Prose precision* — typically 2 decimal places (`$0.93$`, `$+0.38$ to $+0.47$`, `$0.53$--$0.62$`). Reads cleanly; matches the rounding used in abstracts and intros.
+- *Table precision* — typically 3 decimal places (`$21/21 = 1.000$`, `$0.571$`, `$0.952$`). Tables can carry the precise rational; prose rounds.
+The two precisions are independent — tables stay 3-dp even when the prose around them uses 2-dp.
+
+**Anti-pattern (mixed precision in prose)**: a single results paragraph that mixes `the Distilled-Prompt VLM reaches at least $0.93$ on every task; the Naked-Modality VLM sits at $0.533$--$0.619$ on the same evaluation groups. The $+0.38$ to $+0.47$ absolute gap holds ...` — the `$0.533$--$0.619$` (3-dp) clashes with the surrounding `$0.93$` (2-dp) and `$+0.38$ to $+0.47$` (2-dp). Round the outlier range to match: `$0.53$--$0.62$`.
+
+**Cross-section lock**: the abstract's numerical voice fixes the precision for the whole paper. If the abstract reports `$+0.38$ to $+0.47$`, every subsequent prose mention of that delta uses the same form. The lock is the prose analog of rule 2's noun-phrase lock.
+
+**Detection**: grep prose files for `\$0\.[0-9]{3}` and `\$0\.[0-9]{2}\b`. If both forms appear in the same paragraph or section, normalize to the dominant precision.
 
 ### E4. Interpretation verbs ("We observe..." / "We find...")
 
@@ -453,6 +468,9 @@ Overuse of hedges reads as evasive; absence reads as overclaiming. Aim for hedge
 | **`X row` in prose** (no table cited) | `X baseline` / `X condition` / `X setting` / `X variant` (see Section K and SKILL.md rule 16) |
 | **`baseline row`** | `baseline` (drop redundant "row") |
 | **`X column` in prose** (no table cited) | `X metric` / `X axis` / `X dimension` |
+| **Colloquial result verbs**: `clears $\geq X$`, `tops the leaderboard`, `nails`, `crushes`, `beats out`, `blows past` | Academic equivalents: `reaches at least $X$`, `achieves the best score`, `outperforms`, `exceeds`. See E2 colloquial-verb anti-pattern. |
+| **`sits at $X$--$Y$`** (borderline colloquial for the *low* baseline) | `remains at $X$--$Y$` / `stays in the $X$--$Y$ band` / for sharper contrast `falls within $X$--$Y$, well below {comparator}`. `sits` is acceptable in informal section summaries; not in Abstract or Conclusion. |
+| **`fork`** (GitHub vocabulary) | `built on` / `extends X's task suite` / `derived from` / `following X`. See SKILL.md rule 25. |
 
 **Test**: if you delete the adjective, does the sentence say less? If not, delete it.
 
@@ -479,6 +497,10 @@ Overuse of hedges reads as evasive; absence reads as overclaiming. Aim for hedge
 | **Repeating a load-bearing scope-tag modifier outside its definition** — `successful exploratory trace` appears in §2/§4/§5/§7 after being defined in §3.1; `held-out test groups` repeated when `test groups` already implies held-out; `frozen base VLM` repeated when context already locked "frozen" earlier | Define the modifier once at the scope-setting site (Problem Setup / Abstract / first introduction) and drop it from every subsequent reference. The reader carries it mentally. Exception: when the modifier carries a *local* adjective meaning (`the second, successful pull` = the attempt that succeeded), keep it. See SKILL.md rule 20. |
 | **Leaking an instantiation noun into conceptual framing positions** — `iterates on demos` in Abstract / Intro / Method when the framework-level concept is `trace`; `controller` used in framing positions when the concept is `policy`; `trial` when the concept is `episode` | Use the type-general concept noun (`trace`, `policy`, `episode`, `observation`) everywhere — Abstract, Intro, Method, Results, Conclusion. Disclose the concrete instantiation (`demonstration`, `transformer policy`, `attempt`, `RGB frame`) only at the source-disclosure site (Experiments setup or Appendix dataset section), with a one-line note clarifying the framework is not instantiation-bound. See SKILL.md rule 21. Operational sweep: `vocab-lock` in `tools/audit_conventions.sh`. |
 | **Unnamed new task** — `procedural QA`, `procedural multimodal QA`, `our QA task`, `the QA we propose`, `manipulation reasoning task` used as the contribution's handle in Abstract / Intro / Method | Coin a **named abbreviation** following the corpus pattern `{Domain}-QA` / `{Domain}-Bench` (e.g., `EMT-QA = Exploratory Manipulation Trace QA`, cf. RoboVQA / ManipBench / EgoPlan-Bench2). Introduce as `{Full Expansion} ({Abbreviation})` at first mention in each major section (Abstract, Intro, Method); use the abbreviation only thereafter. Formalize the I/O definition in Method's Problem Setup. Add the abbreviation to `\keywords{...}`. See SKILL.md rule 22. |
+| **Mixed decimal precision in prose** — paragraph mixing `$0.93$` (2-dp), `$0.533$--$0.619$` (3-dp), and `$+0.38$ to $+0.47$` (2-dp) | Normalize to the dominant precision in prose (typically 2-dp): `$0.93$`, `$0.53$--$0.62$`, `$+0.38$ to $+0.47$`. Tables keep their 3-dp precision independently. The abstract's numerical voice fixes the prose precision for the whole paper. See E3 decimal-precision lock. |
+| **Colloquial result verbs in prose** — `the Distilled-Prompt VLM clears $\geq 0.93$`; `our method tops the leaderboard`; `we crush the baseline by 30%` | Academic equivalents: `reaches at least $0.93$`; `achieves the best score`; `outperforms the baseline by 30%`. See E2 colloquial-verb anti-pattern. The verb should claim the result, not commentate on it. |
+| **Engineering jargon in prose** — `simulated in IsaacGym on an AdaManip fork`; raw LaTeX macro tokens `\langtmpl{}` or `\addprompt{}` rendering as undefined nouns in the PDF; phantom internal actors `the dispatcher / the driver / the orchestrator commits` when only one named agent has been introduced | (a) GitHub words → academic equivalents (`fork` → `built on` / `extends`). (b) Raw macros → expand inline to the conceptual phrase, OR replace with the contribution noun phrase already in scope. Delete the macro and replace all callers when the expansion is a legacy noun. (c) Phantom actors → collapse to the one named actor (`the agent commits ...`) or use passive (`the candidate is committed only when ...`). See SKILL.md rule 25. |
+| **Section title or caption with colon-paraphrase** — `\section{Main Results: Iteration Uplift on EMT-QA}`; `\caption{Main results: closed-loop uplift on EMT-QA chain accuracy. The Naked-Modality VLM is ...}` (the post-colon phrase paraphrases the topic noun without adding scope) | Drop the post-colon clause: `\section{Main Results}` + `\caption{Main results. The Naked-Modality VLM is ...}`. The topic noun stands alone; the body / subsection title carries the specific scope. Colons remain legitimate when the post-colon clause adds scope, comparator, or domain anchor (`Limitations: known failure modes`, `Ablation: with vs. without pretraining`). See SKILL.md rule 27. |
 
 ---
 

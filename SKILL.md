@@ -375,6 +375,7 @@ Step 5: Prioritize fixes
 2. **Lock the contribution noun phrase**.
    - First time you draft something with the system name, write it as `{Name}, a {descriptor}` and tell the user "this is the canonical phrase — re-use it verbatim in Method, Experiments, Conclusion."
    - When reviewing, flag any drift (`OpenVLA` vs `Openvla`, `our system` vs the actual name).
+   - **Legacy-cleanup discipline when renaming a locked noun**: when the user upgrades a concept name mid-revision (e.g. `attempt-chain` → `exploratory chain` to anchor the task name's `Exploratory` root; or `\addprompt` → `DRH` after standardizing the artifact name), sweep ALL occurrences across main body, appendix, table captions, figure captions, and `math_commands.tex` (or equivalent macro file). Remove any legacy macros that expand to the old name. Reviewers who spot the legacy name in one caption assume mid-revision rot in the rest of the paper. Detection: after a rename, `grep -rn "{old_noun}"` over the whole paper tree must return zero hits in live (uncommented) prose.
 
 3. **Tense rules**.
    - Abstract = present (`we introduce`).
@@ -533,12 +534,79 @@ Step 5: Prioritize fixes
     - **Keywords entry**: the abbreviation belongs in the `\keywords{...}` list alongside the method name and domain (e.g., `EMT-QA, exploratory manipulation, prompt distillation`).
     - **Detection**: when reviewing, grep the paper for `\bQA\b` / `\bbenchmark\b` / `\btask\b` in framing positions (Abstract, Intro, Method opener). If the paper reaches for a generic descriptor where a proper name should be, flag it. The `vocab-lock` sweep can also lock legacy generic descriptors (`procedural-QA`, `our task`) once the proper name is chosen, preventing regression.
     - **Sibling to rule 2** (lock contribution noun phrase). Rule 2 locks the *system name* (`Closed-Loop Trace Distillation`); rule 22 locks the *task name* (`EMT-QA`). A paper that proposes a method + a task + a trained artifact needs all three names locked independently. Worked example of a fully-named triad: **EMT-QA** (task, rule 22) × **Closed-Loop Trace Distillation** (method, rule 2) × **Distilled Reading Heuristic / DRH** (artifact, rule 2 — same locking discipline as system names). Picking same-root abbreviations across the triad (here `Distill-` shared by method and artifact) makes the contribution scannable as a single citation entity.
+    - **Choosing the right generic descriptor for the task abbreviation**: after locking `{Abbrev}`, the generic-noun descriptor that lives in `{Full Expansion} ({Abbrev}), a {descriptor}` must also lock across abstract / intro / method first-mentions. Anti-patterns:
+      - *Too narrow* (descriptor names an implementation specific, not the task type): `chain-prediction task`, `phase-segmentation task`, `reward-classification task` — these read as method choices, not task definitions.
+      - *Too generic* (drops the input modality that distinguishes the task): `QA task`, `reasoning task`, `prediction task`.
+      - *Balanced* (acknowledges the abbreviation's structural suffix AND the input modality): `multimodal QA task` (matches the `QA` suffix in `{X}-QA`), `multimodal reasoning task`, `multimodal {domain} benchmark`.
+      Worked example: for `Exploratory Manipulation Trace QA (EMT-QA)`, the locked descriptor is `multimodal QA task` — not `chain-prediction task` (too narrow, locks the framing to one prediction style) and not `QA task` (too generic, drops the video+proprio multimodal input).
 
 23. **User edit instructions are intent specifications, not final prose** (companion to rule 10/13).
     - When the user describes a desired edit in colloquial language (often Chinese, often a single imperative — "拆出一节说明泛化性", "这一句优化下", "方法具有一定泛化性"), treat the message as **intent**, not as draft text. Parse the underlying paper-writing move (split a paragraph, fold a sub-clause, hedge a claim, re-sequence a list, credit-then-limit, swap a connector, rename a section) and realize it in the venue's published register using the relevant playbook step. Never transliterate.
     - **Anti-pattern**: copying the user's literal phrasing into the paper. "方法具有一定泛化性" rendered as "the method has a certain generalization" surfaces the user's voice, not the published voice. "这一段挺好的" rendered as "this paragraph is good" is not paper prose at all — it was metadata about the *previous* edit, not text for the *next* edit.
     - **How to apply**: (i) identify what paper-writing move the user is asking for; (ii) look up the canonical form for that move in the routed playbook step; (iii) write prose in that form. If the move is not obvious, ask one clarifying question rather than draft the literal translation.
     - **Same rule applies recursively to skill edits**. When the user says "将这点也写到 skill 中" / "skill 里没有说明吗", parse what *kind* of rule they want recorded — a paper-writing convention, a collaboration meta-rule, an anti-pattern entry, a routing-table row — and place it in the corresponding section. Do not paste the user's phrasing into the skill as if it were a rule statement, and do not promote a one-off paper edit into a paper-writing rule unless the user asked for a generalizable rule. When in doubt, ask which class.
+
+24. **Generic-then-named first mention for new artifacts** (extends rule 22 from task names to non-task contribution nouns).
+    - When introducing a new artifact noun (a heuristic, a prompt, an encoding, a layer, an intermediate object), the canonical first-mention form is `a {generic descriptor}, which we call the {Name} ({Abbr})`. Generic noun first, named noun second. Reader builds a picture from the generic noun, then caches the name as a handle for that picture.
+    - The pattern repeats in EVERY major section's first mention — Abstract, Intro ¶3, Method §3.{problem-setup or pipeline}, and Conclusion. Reviewers may skip from abstract straight to method or to results; each major section's first-mention must be self-contained with both the gloss and the name.
+    - **Anti-pattern (name-first)**: `We distill a *Distilled Reading Heuristic* (DRH) over the trace.` — name introduced without prior gloss; reader cannot picture what it is until they read further.
+    - **Canonical form (generic-then-named)**: `We distill a one-line natural-language prompt over the trace, which we call the *Distilled Reading Heuristic* (DRH).` — generic descriptor first; the name caches the descriptor.
+    - **Inline-gloss companion for non-abbreviated core nouns**: e.g., `minimal-success action chain`, `chain accuracy`. Use the same per-section first-mention discipline with a comma-appositive inline gloss: `the minimal-success action chain, the fewest actions that complete the task, follows from the precondition`. The appositive serves the same role as `which we call` does for abbreviated nouns.
+    - **Detection**: grep abstract / intro / method for the first appearance of every emphasized (`\emph{...}`) or capitalized contribution noun. If the first appearance lacks a preceding generic noun + comma + `which we call` (or equivalent appositive gloss), flag it.
+    - This is the **artifact analog** of rule 22 (which applies first-mention discipline to task names). Rule 22 = task name; rule 24 = artifact name + non-abbreviated core nouns.
+
+25. **No engineering jargon in academic paper prose**.
+    - Three classes of jargon to elide before submission:
+      1. **Version-control / GitHub vocabulary**: `fork`, `branch`, `clone`, `PR`, `monorepo`. These are author-developer words; in published prose they read as engineering-shop talk, not academic claim. Use `built on`, `extends X's task suite`, `derived from`, `following X`. Anti-pattern: `Simulator traces are collected in IsaacGym on an AdaManip fork.` → Canonical: `Simulator traces are collected in IsaacGym building on the AdaManip task suite.`
+      2. **Raw LaTeX macros that expand to implementation-level nouns**: macro names like `\langtmpl` (`the task-keyed prompt template`), `\addprompt` (legacy artifact name), `\confkey`, `\cfgflag` are author-only shorthand for internal abstractions. In the rendered PDF the reader sees a phrase the paper never defined, OR they see the macro name itself if the macro is missing — either way the reader is confused. Fix: (a) expand the macro inline to its conceptual phrase when short (`the task-keyed prompt template`), OR (b) replace with the contribution noun phrase already in scope (`a single line per task` → `the DRH`). If a macro expands to a legacy noun that has been renamed, delete the macro and replace all callers with the new noun.
+      3. **Internal-system actors the paper does not formally introduce**: phrases like `the driver commits`, `the dispatcher dispatches`, `the orchestrator schedules`, `the runtime evaluates` introduce phantom actors. Reviewers cannot tell whether `driver` is a synonym for the named `agent` or a distinct component. Collapse to the actors the paper already defines (typically the named agent), and rephrase the action accordingly. Anti-pattern: `The agent proposes a candidate DRH; the closed-loop driver commits the candidate.` → Canonical: `The agent proposes a candidate DRH and commits it only when ...` (or, when the agent is grammatically inconvenient, use passive: `the candidate is committed only when ...`).
+    - **Detection**: grep main body for `fork`, `branch`, `\\\\[a-z]+(?=[\s{}])` (raw macro tokens), and any noun ending in `-er` or `-or` that the paper has not introduced via `\textbf{}` / `\emph{}` definition. Flag each hit for elision or replacement.
+    - This rule is the **prose analog** of rule 17 (config-parameter relegation). Rule 17 moves engineering specifics to the appendix; rule 25 removes engineering vocabulary from the prose itself even when the specifics are warranted.
+
+26. **Method abstraction vs Experiment specifics — separation of duty**.
+    - Method §3 paragraphs describe hyperparameter **semantics and trade-offs**, not specific values. The reader leaves §3 understanding what each hyperparameter controls; they look in §4 (Experimental Setup) for the values used.
+    - **Method-side (semantics + trade-off)**: `The two hyperparameters K and the gate threshold jointly trade off per-round wall-clock, agent-token consumption, training-trace coverage (larger K samples more variety), and the committed artifact's robustness (stricter gates filter unreliable candidates at the cost of convergence speed). Specific values are documented in \S\ref{sec:setup_main}.`
+    - **Experiment-side (values only, no trade-off re-explanation)**: `The closed-loop iteration uses K=3 and a chain-accuracy gate of 0.85.`
+    - **Anti-pattern (mixed responsibilities)**: dumping `K=3`, `gate=0.85`, `per-group cap=21`, AND a `5–30-min budget` claim AND the trade-off explanation into a single method paragraph. The reader cannot tell where the method abstraction ends and the experiment specifics begin; the trade-off claim reads as a *justification for the specific values* rather than as method-level semantics.
+    - **Range-reporting follows the same split**:
+      - *Method-side ranges describe artifact constraints* — report **upper bound only**: `The committed DRH stays within 200 tokens.`, `Each iteration round completes in at most 30 minutes.`
+      - *Experiment-side ranges describe what actually happened* — report **full range**: `Each task's iteration run converged in 1–5 candidate-DRH rounds; the committed DRH was 50–200 tokens across our 5 tasks.`
+      - The semantic distinction is **constraint vs. observation**. Method paragraphs declare the upper limit the artifact is designed to respect; experiment paragraphs record the empirical distribution.
+    - **Detection**: grep method paragraphs for specific numeric values (`K=`, `\bgate\s*=`, `\$[0-9]`). Each occurrence must justify itself as a method-essential constant (e.g., the value affects the reader's understanding of the trade-off itself, like a sigmoid temperature whose effect is non-linear). Otherwise relegate to §4.
+
+27. **Section title and caption anti-colon-description**.
+    - Section titles and table/figure captions should not pair the topic noun with a colon- or comma-introduced paraphrase of the same topic.
+    - **Anti-pattern (section title)**: `\section{Main Results: Iteration Uplift on EMT-QA}` — `Main Results` already establishes the section's role; `Iteration Uplift on EMT-QA` paraphrases the paper's thesis without adding scope.
+    - **Anti-pattern (table caption opener)**: `\caption{Main results: closed-loop uplift on EMT-QA chain accuracy. The Naked-Modality VLM is ...}` — the opener phrase doubles the section title; the body already specifies the comparison.
+    - **Canonical form**: `\section{Main Results}` and `\caption{Main results. The Naked-Modality VLM is ...}`. The topic-noun stands alone; the body carries the specific information.
+    - **When IS a colon legitimate?**: when the post-colon clause carries information the topic noun does NOT. Tests:
+      - Scope-narrowing: `Limitations: known failure modes` (scope: we cover failure modes, not other limitation classes).
+      - Comparison framing: `Ablation: with vs. without pretraining` (specific comparator pair).
+      - Domain anchor on a generic topic: `Datasets: BridgeData V2 and OpenX` (names the actual datasets).
+      - Question hook in display titles (mostly for sub-section-style display in posters / slides): `Why does the DRH transfer? Mechanism analysis` — only justified when reading the title alone (no body context) leaves ambiguity.
+      - **The test**: would the section/caption be self-explanatory without the post-colon clause? If yes, drop the clause.
+    - **Detection**: grep `\section{`, `\subsection{`, `\caption{` for `:` followed by a noun phrase. For each hit, ask whether the post-colon noun adds scope, comparator, or domain anchor — or merely paraphrases the topic.
+
+28. **Opener variety across consecutive paragraphs in a cluster**.
+    - When a section has 3+ consecutive paragraphs (typical in Limitations, Experimental Setup, multi-axis Ablations), DO NOT start all of them with the same syntactic frame.
+    - **Anti-pattern**: three Limitations paragraphs all opening with `Our pipeline ...`, `Our traces ...`, `Our evaluation ...` — the possessive repetition reads as monotone and unrhythmic.
+    - **Canonical alternation** — pick distinct opener patterns across the cluster:
+      - *Possessive*: `Our pipeline assumes ...`
+      - *Definite article*: `The reported traces come from ...`
+      - *Universal quantifier*: `All evaluation traces come from ...`
+      - *Locative PP*: `Across three simulator and two real-robot tasks on distinct embodiments, the DRH ...`
+      - *Concession*: `Although the EMT-QA formulation admits ..., our evaluation covers only ...`
+      - *`While X, Y` hedge*: `While our method achieves ..., its accuracy degrades in ...`
+    - **Rule of thumb**: in a 3-paragraph cluster, use 3 distinct opener patterns. In a 4+ paragraph cluster, no opener pattern appears more than twice and never twice in adjacent paragraphs.
+    - **Detection**: list the first 4 words of every paragraph in the cluster. If the first noun phrase repeats 3+ times in a row, rewrite the openers to diversify per the patterns above.
+    - See `language-phrasebank.md` Section H for full opener inventory.
+
+29. **One subsection, one topic**.
+    - A `\subsection{...}` carries one distinct method or empirical topic. When the subsection title declares topic A but the prose mixes topics A and B, reviewers feel the cross-topic sentence is out of place and skim past it.
+    - **Anti-pattern**: `\subsection{Incremental multi-task via prompt-only artifacts}` whose first sentence describes the multi-task scaling property (topic A) and whose second sentence describes the fairness controls for the Distilled-Prompt vs. Naked-Modality comparison (topic B). Topic B belongs in §3.2 (the inference protocol cluster), not in the multi-task section.
+    - **Fix-in-place rule**: for every sentence in a subsection, ask "does this sentence's claim fall under the subsection title's noun phrase?" If not, the sentence belongs in a different subsection — typically a sibling `\textbf{Label.}` paragraph in the closest method-level cluster.
+    - **Detection**: for each `\subsection{...}`, list the sentence-level claim of every sentence. Group by topic-noun. If two distinct topic-nouns appear, the subsection mixes topics — split or relocate.
+    - This rule is the **section-level analog** of rule 5 (one pivot per gap). Rule 5 keeps a single paragraph's argument structurally clean; rule 29 keeps a single subsection's topical scope clean.
 
 ---
 
