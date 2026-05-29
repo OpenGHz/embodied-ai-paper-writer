@@ -343,6 +343,8 @@ Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + 17 + 18 + 19
     — must appear in ¶1 or ¶2 (rule 7).
   → Limitation pairing: every `\textbf{...}` / `**...**` limitation label
     must have a `Future work could ...` sentence in the same paragraph (rule 8).
+    Anti-pattern: a standalone `\textbf{Future work.}` block at section end —
+    fold each direction into its source limitation paragraph instead.
   These eleven sweeps catch the high-frequency, low-effort misses that the
   4-lens scan tends to skip.
 
@@ -400,6 +402,7 @@ Step 5: Prioritize fixes
 
 8. **Every limitation pairs with a future-work mitigation**.
    - Naked limitations read as defeatist. Each gets `Future work could ...` in the same paragraph.
+   - **Anti-pattern**: a standalone `\textbf{Future work.}` paragraph at the end of the section. The default CoRL/RSS/ICRA pattern (D1 in `closing-appendix-playbook.md` Step 10) folds each direction into its source limitation paragraph. Reserve a standalone Future Work section for Science Robotics or heavy-page-budget submissions with 3+ unrelated directions that don't map onto existing limitation paragraphs.
 
 9. **Hedge first-claims with scope**.
    - Never write `We are the first to do X.` — write `To the best of our knowledge, we are the first to do X under constraint Y.`
@@ -532,6 +535,12 @@ Step 5: Prioritize fixes
     - **Keywords entry**: the abbreviation belongs in the `\keywords{...}` list alongside the method name and domain (e.g., `EMT-QA, exploratory manipulation, prompt distillation`).
     - **Detection**: when reviewing, grep the paper for `\bQA\b` / `\bbenchmark\b` / `\btask\b` in framing positions (Abstract, Intro, Method opener). If the paper reaches for a generic descriptor where a proper name should be, flag it. The `vocab-lock` sweep can also lock legacy generic descriptors (`procedural-QA`, `our task`) once the proper name is chosen, preventing regression.
     - **Sibling to rule 2** (lock contribution noun phrase). Rule 2 locks the *system name* (`Closed-Loop Trace Distillation`); rule 22 locks the *task name* (`EMT-QA`). A paper that proposes a method + a task + a trained artifact needs all three names locked independently. Worked example of a fully-named triad: **EMT-QA** (task, rule 22) × **Closed-Loop Trace Distillation** (method, rule 2) × **Distilled Reading Heuristic / DRH** (artifact, rule 2 — same locking discipline as system names). Picking same-root abbreviations across the triad (here `Distill-` shared by method and artifact) makes the contribution scannable as a single citation entity.
+
+23. **User edit instructions are intent specifications, not final prose** (companion to rule 10/13).
+    - When the user describes a desired edit in colloquial language (often Chinese, often a single imperative — "拆出一节说明泛化性", "这一句优化下", "方法具有一定泛化性"), treat the message as **intent**, not as draft text. Parse the underlying paper-writing move (split a paragraph, fold a sub-clause, hedge a claim, re-sequence a list, credit-then-limit, swap a connector, rename a section) and realize it in the venue's published register using the relevant playbook step. Never transliterate.
+    - **Anti-pattern**: copying the user's literal phrasing into the paper. "方法具有一定泛化性" rendered as "the method has a certain generalization" surfaces the user's voice, not the published voice. "这一段挺好的" rendered as "this paragraph is good" is not paper prose at all — it was metadata about the *previous* edit, not text for the *next* edit.
+    - **How to apply**: (i) identify what paper-writing move the user is asking for; (ii) look up the canonical form for that move in the routed playbook step; (iii) write prose in that form. If the move is not obvious, ask one clarifying question rather than draft the literal translation.
+    - **Same rule applies recursively to skill edits**. When the user says "将这点也写到 skill 中" / "skill 里没有说明吗", parse what *kind* of rule they want recorded — a paper-writing convention, a collaboration meta-rule, an anti-pattern entry, a routing-table row — and place it in the corresponding section. Do not paste the user's phrasing into the skill as if it were a rule statement, and do not promote a one-off paper edit into a paper-writing rule unless the user asked for a generalizable rule. When in doubt, ask which class.
 
 ---
 

@@ -167,6 +167,8 @@ For standalone Future Work, use 2–4 named sub-directions, each with a noun-phr
 > `**Multi-agent Soccer:** An exciting direction of future work would be to train teams of two or more agents.`
 > `**Playing Soccer from Raw Vision:** Another important direction for future work is learning from on-board sensors only.`
 
+**Anti-pattern (CoRL / RSS / ICRA)**: at page-limited venues, do NOT close the Limitations section with a standalone `\textbf{Future work.}` mini-paragraph that re-lists every limitation's mitigation. Reviewers read this as duplicated material and as Future Work "promoted" out of its source limitation paragraph. If a future-work direction maps onto an existing limitation paragraph, fold it in as the closing sentence of that paragraph (D1). Reserve a standalone block only for directions that are genuinely orthogonal to every limitation you raised.
+
 ---
 
 # PART 4 — Coupling closing sections to the rest of the paper
