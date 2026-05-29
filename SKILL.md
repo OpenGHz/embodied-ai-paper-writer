@@ -1,31 +1,13 @@
 ---
 name: embodied-ai-paper-writer
 description: |
-  Professional embodied-AI paper-writing coach. Distilled from 63 top-conference
-  papers (CoRL, RSS, ICRA, IROS, Science Robotics, 2022–2026) covering writing
-  craft only — vocabulary, sentence patterns, paragraph flow, figure/table
-  conventions, section-by-section construction, rhetorical pivots, and appendix
-  norms. NOT a content advisor — this skill teaches HOW to write, not WHAT
-  to claim.
+  Professional embodied-AI paper-writing coach distilled from 63 top-conference papers (CoRL, RSS, ICRA, IROS, Science Robotics, 2022–2026). Teaches writing craft only — vocabulary, sentence patterns, paragraph flow, figure/table conventions, section-by-section construction, rhetorical pivots, appendix norms. NOT a content advisor: teaches HOW to write, not WHAT to claim.
 
-  Use when the user mentions: writing a paper, drafting a section (abstract,
-  intro, method, related work, experiments, results, ablations, figures,
-  tables, conclusion, limitations, future work, appendix), titling a paper,
-  reviewing a draft, fixing a section, captioning a figure, comparing baselines,
-  or asking how top embodied-AI papers structure something.
+  Use when the user mentions writing or reviewing any paper section (abstract, intro, method, related work, experiments, results, ablations, conclusion, limitations, appendix), titling, figure captioning, paragraph polishing, rebuttals, or submission prep.
 
-  Triggers in English: "write my abstract", "draft an intro", "title my paper",
-  "caption this figure", "how do top robotics papers do X", "review this
-  section", "fix my method", "polish this paragraph", "tighten this section",
-  "what should be in the appendix", "how do I present results", "limitations
-  section", "transition between paragraphs", "is this sentence right for a
-  CoRL paper", "help with my rebuttal", "respond to reviewer", "ready for
-  submission".
+  English cues: "write my abstract", "draft an intro", "title my paper", "caption this figure", "review this section", "fix my method", "polish this paragraph", "limitations section", "help with my rebuttal", "ready for submission".
 
-  Triggers in Chinese: 「帮我写摘要」「润色引言」「修改这段」「这个figure怎么标caption」
-  「我的method怎么组织」「这段experiments怎么写」「这个标题行不行」
-  「conclusion怎么收尾」「reviewer会怎么看」「rebuttal怎么写」「投稿前帮我看一下」
-  「这段话像不像顶会风格」.
+  Chinese cues: 「帮我写摘要」「润色引言」「修改这段」「figure怎么标caption」「method怎么组织」「experiments怎么写」「conclusion怎么收尾」「rebuttal怎么写」「投稿前帮我看一下」「像不像顶会风格」.
 ---
 
 # Embodied-AI Paper Writer · Writing-Craft Operating Manual
@@ -89,6 +71,22 @@ Match the user's request to a row, then read ONLY the listed reference file(s). 
 ## Execution rules (most important)
 
 **When this skill activates, follow these rules. Different request types take different paths.**
+
+### Step 0 — Terminology alignment (applies to ALL scenarios below)
+
+Before writing or revising any content, confirm with the user the definitions and canonical spellings of key concepts, terms, and named entities that will appear in the paper. This ensures narrative consistency across sections.
+
+```
+→ List the key terms you've identified (system name, task name, method components,
+  baseline labels, dataset names, domain-specific nouns).
+→ For each, propose a canonical form (spelling, capitalization, hyphenation).
+→ Ask the user to confirm, correct, or add missing terms.
+→ Lock the confirmed terminology list — use these forms verbatim throughout.
+→ If the user has already provided a terminology list or the terms are obvious
+  from prior context, acknowledge and lock without re-asking.
+```
+
+This step feeds into Scenario A Step 3.5 (noun-phrase lock) and Universal Rule 2 (contribution noun phrase). It extends the same discipline to ALL named concepts, not just the system name.
 
 ### Scenario A — User wants to write a NEW section from scratch
 
