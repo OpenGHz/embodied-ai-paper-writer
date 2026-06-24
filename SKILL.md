@@ -655,8 +655,8 @@ Step 5: Prioritize fixes
 | `references/method-relatedwork-playbook.md` | Related Work 3-act narrative, Method system-name commitment, equation sandwich, sub-corpus matching | 18 KB |
 | `references/experiments-results-playbook.md` | Question-list opener, baseline framing, ablation pairwise narration, sim-vs-real tagging, hardware paragraph | 22 KB |
 | `references/figures-tables-playbook.md` | 8 figure roles (F1–F8), teaser ingredients, table-caption-as-takeaway, panel notation, statistical disclosure | 19 KB |
-| `references/teaser-figure-playbook.md` | F1 teaser / graphical abstract deep-dive: naming, 4 visual variants, image composition, caption-as-promise, Intro reference, drawing-prompt artifact + approval gate, anti-patterns | 8 KB |
-| `references/teaser-prompt.template.yaml` | Copy-to-`teaser-prompt.yaml` template: the single reference consolidating variant/layout/caption/generation-prompt/output-path/Intro-pointer for the teaser | 2 KB |
+| `references/teaser-figure-playbook.md` | F1 teaser / graphical abstract deep-dive: naming, 4 visual variants, image composition + conference visual-style standards, caption-as-promise, Intro reference, drawing-prompt artifact + approval gate, draw→review→refine loop, anti-patterns | 10 KB |
+| `references/teaser-prompt.template.yaml` | Copy-to-`teaser-prompt.yaml` template: the single reference consolidating variant/layout/caption/style/generation-prompt/output-path/Intro-pointer/review-bar for the teaser | 2 KB |
 | `references/language-phrasebank.md` | Section A–K rhetorical phrasebook: openers, contributions, pivots, hedging, connectors, anti-patterns | 24 KB |
 | `references/flow-transitions.md` | 6-move paper arc, section openers, contribution-restatement spiral, pivot family, inter-paragraph connectors | 22 KB |
 | `references/closing-appendix-playbook.md` | Conclusion 3-move recap, Limitations admit-and-propose, Appendix TOC, hyperparameter conventions, Author Contributions | 25 KB |

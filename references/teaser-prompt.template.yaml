@@ -32,6 +32,14 @@ color_coding:                    # omit the block entirely if the image uses no 
   - element: "baseline trajectory"
     color: gray
 
+style:                           # top-tier-conference visual standards (see playbook Step 2)
+  palette: "3–5 coordinated colors, restrained (no rainbow)"
+  background: "clean white / near-white"
+  labels: "sans-serif, readable size, clear hierarchy, English"
+  grayscale_safe: true           # must stay readable in B&W and at thumbnail/column scale
+  arrows: "thick, dark, labeled, non-crossing, correct direction"   # for pipeline/schematic regions
+  avoid: "rainbow gradients, heavy shadows, 3D, glow, clip-art, slide-deck styling"
+
 generation_prompt: >             # the actual text handed to the image model OR the brief for a designer
   A photographic two-panel figure. Left: a person teleoperating a bimanual
   mobile robot to take food from an open fridge. Right: the same robot
@@ -52,6 +60,11 @@ intro_reference: >               # paste-ready pointer for Intro ¶1–2, must c
 venue_constraints:               # fill when the target asks for a graphical abstract
   required: false
   spec: "e.g. Elsevier 1328x531 px; min 8pt font; must read at thumbnail size"
+
+review:                          # draw -> review -> refine loop (see playbook Step 5)
+  loop: false                    # DEFAULT off: one quick render. Set true to iterate.
+  target_score: 9                # (loop only) accept at >= this (1-10); strict grader
+  max_rounds: 5                  # (loop only) cap refinement rounds; prefer few strong ones
 
 open_questions:                  # anything to confirm with the user before drawing
   - "Confirm the right panel shows the cooking task, not the laundry task."

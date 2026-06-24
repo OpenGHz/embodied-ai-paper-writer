@@ -62,6 +62,16 @@ Design rules that hold across variants:
 - **Color is a naming device.** If the teaser color-codes method vs. baseline or task categories, that mapping must be disclosed in the caption (see Step 3, ingredient 7).
 - **Numbered steps for pipelines.** When the teaser walks through a sequential procedure, number the steps in the image and mirror them in the caption (e.g., RoboCook's 9-step dumpling sequence).
 
+### Visual style standards (top-tier-conference grade)
+
+These apply most to the **pipeline+punchline** and any schematic/diagram regions; the photographic montage / single-shot variants inherit the palette, label, and grayscale rules but not the arrow rules.
+
+- **Restrained palette** — 3–5 coordinated colors, not a rainbow. Keep a stable mapping between a meaning and its color across the whole figure (and the rest of the paper's figures).
+- **Survives grayscale + scaling** — the figure must stay readable when printed in black-and-white and when shrunk to column width / thumbnail. Don't let color be the *only* carrier of a distinction.
+- **Clean background, clean type** — white/near-white background, sans-serif labels at a readable size with a clear size hierarchy (main modules larger, secondary smaller). No tiny unreadable text.
+- **Arrows (for pipeline/schematic regions) — the most error-prone element**: thick strokes, large unmistakable arrowheads, dark color; label important arrows with what flows through them; route to avoid crossings; and **point in the correct direction**.
+- **Tasteful, not decorative** — subtle same-family gradients and restrained rounded corners are fine. Avoid rainbow gradients, heavy drop shadows, 3D perspective, glow, clip-art icons, and slide-deck styling. Aim for *paper-ready, not slide-ready*.
+
 ---
 
 ## Step 3 — Write the caption as a promise
@@ -102,12 +112,12 @@ This is the teaser-specific instance of the skill's PRE-DRAFT CHECKPOINT discipl
 
 - `variant`, `rationale` — the Step 1 choice and why.
 - `system_name`, `headline_capability` — what the image must convey.
-- `layout` (`composition` + per-panel `shows`), `embodiment`, `environment`, `color_coding` — the Step 2 composition.
+- `layout` (`composition` + per-panel `shows`), `embodiment`, `environment`, `color_coding`, `style` — the Step 2 composition and visual-style standards.
 - `generation_prompt` — the actual text handed to the image model or designer.
 - `output_path`, `figure_label`, `placement` — where the drawn image lives and how it sits in the paper.
 - `caption` — the paste-ready Step 3 promise caption.
 - `intro_reference` — the paste-ready Intro pointer (its `\ref{}` must match `figure_label`).
-- `venue_constraints`, `open_questions` — graphical-abstract specs and anything to confirm first.
+- `venue_constraints`, `review`, `open_questions` — graphical-abstract specs, the draw→review→refine acceptance bar, and anything to confirm first.
 
 **Then gate**: present the artifact and ask explicitly —
 
@@ -119,9 +129,35 @@ This is the teaser-specific instance of the skill's PRE-DRAFT CHECKPOINT discipl
 
 ---
 
-## Step 5 — Draw the teaser from the YAML
+## Step 5 — Draw the teaser from the YAML (quick by default)
 
-Generate the image from `generation_prompt`, honoring `layout`, `embodiment`, `environment`, `color_coding`, and any `venue_constraints`. Save it to `output_path`. If the result diverges from the brief, fix the brief first, then redraw — the YAML stays the source of truth, never the other way around.
+Generate the image from `generation_prompt`, honoring `layout`, `embodiment`, `environment`, `color_coding`, `style`, and any `venue_constraints`. Save it to `output_path`. (If you have a dedicated image-generation skill/tool, that tool executes the render; this playbook supplies the brief and the acceptance bar.)
+
+**Default: one quick render.** Produce a single image and hand it back — do **not** spin a review-and-refine loop unless asked. Most teasers go through manual tweaking anyway, so a fast first draft is usually what the user wants. Still apply the Step 2 style standards in the prompt so the one shot lands close.
+
+**Opt-in: the review-and-refine loop.** When the user asks to "polish", "iterate", "make it submission-ready", or sets `review.loop: true` in the YAML, run a tight generate → review → refine loop:
+
+1. **Render** a version (`teaser_v1`, `teaser_v2`, …).
+2. **Review strictly** against the checklist below and **score 1–10**. Be a hard grader: reject a figure that looks attractive but is logically wrong or unreadable.
+3. **Refine** if the score is below `review.target_score` (default **≥ 9**; cap at `review.max_rounds`, ~5). Write *specific, actionable* feedback — say what's wrong, what to preserve, and what to change — never a vague "make it better". Then re-render.
+
+Strict review checklist (use when looping; also a handy one-pass sanity check):
+
+- All major components / panels present, and the **hero behavior reads first**?
+- Embodiment recognizable and deployment context legible?
+- Labels readable (and in the right language), with a clear size hierarchy?
+- For pipeline/schematic regions: arrows thick, dark, labeled, non-crossing, and pointing the **right** way?
+- Palette restrained; survives grayscale and column-width / thumbnail scaling?
+- Looks **paper-ready, not slide-ready** — no glow / rainbow / 3D / clip-art decoration?
+- Matches the `caption`'s promise and the venue's `venue_constraints`?
+
+Example refinement feedback (concrete beats vague):
+
+- `Increase spacing between the teleop panel and the autonomous panel; they read as one scene.`
+- `Make the baseline trajectory thinner and gray so ours (blue) dominates.`
+- `Relabel "long-horizon manip." → "long-horizon household tasks" to match the caption.`
+
+**The YAML stays the source of truth**: if a render diverges from the brief, fix the brief (or the `generation_prompt`) first, then re-render — never let an off-brief image silently redefine the plan.
 
 ---
 
@@ -155,6 +191,9 @@ Forward reference (figure number **before** the description) is the default ever
 | Teaser duplicates a later results figure/table verbatim | The teaser sells the capability; the results figure proves it. Keep them distinct. |
 | Unhedged precedence claim in the intro reference (`We are the first ...`) | Hedge with `To our knowledge` in prose; keep the caption novelty flag terse. |
 | Promising a capability the paper never demonstrates | The teaser is a contract — only show what the experiments deliver. |
+| Accepting a pretty figure that is logically wrong / mislabeled | Score strictly (Step 5); reject on logic/labels/arrows regardless of how attractive it looks. |
+| Slide-deck decoration (glow, 3D, rainbow gradients, clip-art, heavy shadows) | Strip to paper-ready: restrained palette, clean type, tasteful at most (Step 2 style standards). |
+| Thin/hairline or wrong-direction arrows in a schematic region | Thick dark labeled arrows, no crossings, pointing the correct way. |
 
 ---
 
@@ -170,7 +209,9 @@ Forward reference (figure number **before** the description) is the default ever
 | "One iconic behavior carries the paper." | Single dramatic shot. |
 | "Is `we` allowed in the caption?" | Yes — modern convention (`We introduce …`). |
 | "Draw / generate my teaser." | First consolidate `teaser-prompt.yaml` and confirm before drawing (Step 4). |
-| "I have the YAML — now what?" | Draw from it (Step 5), then drive figure placement + Intro reference off it (Step 6). |
+| "I have the YAML — now what?" | Draw one quick render (Step 5), then drive figure placement + Intro reference off it (Step 6). |
+| "Polish / iterate until it's submission-ready." | Opt into the review loop: score 1–10, specific feedback, re-render; accept at ≥ 9 (Step 5). |
+| "What style should the figure be?" | Restrained palette, clean sans-serif labels, grayscale-safe, paper-ready not slide-ready (Step 2 style standards). |
 
 ---
 
@@ -181,7 +222,7 @@ Forward reference (figure number **before** the description) is the default ever
 3. **Compose** with a single reading path, visible embodiment, and legible deployment context (Step 2).
 4. **Write the caption** as a promise: name + value prop + optional scale/novelty/video/color (Step 3).
 5. **Consolidate `teaser-prompt.yaml`** — variant, layout, caption, generation prompt, output path, figure label, Intro pointer — as the single reference, and gate on user approval before drawing (Step 4).
-6. **Draw** from the YAML to `output_path` (Step 5).
+6. **Draw** from the YAML to `output_path` — one quick render by default; loop to review-score-refine only on request (Step 5).
 7. **Drive the downstream off the YAML** — place the figure, then reference it from Intro ¶1–2 (Step 6).
 8. **Sanity check** against the anti-pattern table — especially: no bare label, no undecoded color, no over-promise.
 </content>
