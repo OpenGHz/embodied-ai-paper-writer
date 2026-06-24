@@ -1,0 +1,57 @@
+# teaser-prompt.template.yaml — single reference for Figure 1 / graphical abstract:
+# drawing brief + caption + output + Intro pointer.
+#
+# Usage: copy to `teaser-prompt.yaml` next to the paper, fill in the fields,
+# review/edit, then say "draw it". After drawing, hand this file to an agent to
+# place the figure and write the Intro reference (see teaser-figure-playbook.md
+# Steps 4–6). The example values below are illustrative — replace them.
+
+variant: deployment-montage      # deployment-montage | pipeline-punchline | capability-collage | single-shot
+rationale: >                     # one line: why this variant fits the paper
+  Capability generalizes across environments, so a montage carries it best.
+
+system_name: Mobile ALOHA        # locked spelling (from Step 0 terminology lock)
+headline_capability: >           # the ONE thing the image must convey
+  Bimanual mobile manipulation of long-horizon household tasks.
+
+layout:
+  composition: >                 # overall arrangement + the intended reading path
+    Two-panel split; eye lands on the autonomous task (right) first.
+  panels:                        # one entry per panel/region; omit if single-shot
+    - id: left
+      shows: "A user teleoperates to obtain food from the fridge."
+    - id: right
+      shows: "Mobile ALOHA performs a long-horizon task autonomously."
+
+embodiment: "Mobile ALOHA — bimanual arms on a mobile base"   # robot must be visible/recognizable
+environment: "Real home kitchen, in-the-wild"                  # deployment context to show
+
+color_coding:                    # omit the block entirely if the image uses no encoded colors
+  - element: "our-method trajectory"
+    color: blue
+  - element: "baseline trajectory"
+    color: gray
+
+generation_prompt: >             # the actual text handed to the image model OR the brief for a designer
+  A photographic two-panel figure. Left: a person teleoperating a bimanual
+  mobile robot to take food from an open fridge. Right: the same robot
+  autonomously ... Concrete on scene, framing, lighting, style.
+
+# --- outputs & downstream wiring (consumed after the image is drawn) ---
+output_path: figures/teaser.pdf  # where the drawn image is/will be saved
+figure_label: fig:teaser         # LaTeX \label — the Intro pointer must match this
+placement: >                     # how it sits in the paper
+  Top of page 1, full-width (\begin{figure*}, [t]).
+
+caption: >                       # the 3–6 sentence promise caption from Step 3 (paste-ready)
+  **Mobile ALOHA.** We introduce ... (name + value prop + scale/novelty/video).
+
+intro_reference: >               # paste-ready pointer for Intro ¶1–2, must cite figure_label
+  Mobile ALOHA performs long-horizon household tasks autonomously (see Fig.~\ref{fig:teaser}).
+
+venue_constraints:               # fill when the target asks for a graphical abstract
+  required: false
+  spec: "e.g. Elsevier 1328x531 px; min 8pt font; must read at thumbnail size"
+
+open_questions:                  # anything to confirm with the user before drawing
+  - "Confirm the right panel shows the cooking task, not the laundry task."

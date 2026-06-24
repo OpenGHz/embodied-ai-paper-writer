@@ -90,16 +90,56 @@ The teaser caption shares a fixed structure across the corpus. Include these ing
 
 ---
 
-## Step 4 — Reference the teaser in the Intro
+## Step 4 — Consolidate everything into `teaser-prompt.yaml`, then gate on approval
 
-The teaser must be **pointed to from prose**, in paragraph 1 or 2 of the Introduction — the early reference invites the reviewer's abstract → Fig. 1 → contributions scan path explicitly. Use one of:
+**Never jump straight to drawing.** Once the variant (Step 1), composition (Step 2), and caption (Step 3) are decided, write **all** of it into one file — `teaser-prompt.yaml` — that becomes the **single reference** for the teaser. It holds not just the drawing brief but everything the rest of the pipeline needs: the caption, the image output path, the figure label, and the ready-to-paste Intro pointer. The goal: after the image is drawn, you (or another agent) can hand over *just this YAML* and the downstream work — placing the figure, writing the Intro reference (Step 6) — falls out of it with nothing to re-derive.
+
+This is the teaser-specific instance of the skill's PRE-DRAFT CHECKPOINT discipline: lock the whole plan in one cheap-to-edit place before spending effort on pixels.
+
+**Why YAML** (not JSON / prose): structured enough to separate variant / layout / caption / output / generation-prompt fields, yet human-readable and quick to hand-edit during the review loop, and it supports `#` comments for guidance. JSON has no comments and is clumsy to tweak; free prose is hard to revise field-by-field.
+
+**Template**: copy [`teaser-prompt.template.yaml`](teaser-prompt.template.yaml) to `teaser-prompt.yaml` next to the paper (or wherever the user keeps drafts) and fill it in. Every field carries an inline `#` comment explaining it. The fields, in brief:
+
+- `variant`, `rationale` — the Step 1 choice and why.
+- `system_name`, `headline_capability` — what the image must convey.
+- `layout` (`composition` + per-panel `shows`), `embodiment`, `environment`, `color_coding` — the Step 2 composition.
+- `generation_prompt` — the actual text handed to the image model or designer.
+- `output_path`, `figure_label`, `placement` — where the drawn image lives and how it sits in the paper.
+- `caption` — the paste-ready Step 3 promise caption.
+- `intro_reference` — the paste-ready Intro pointer (its `\ref{}` must match `figure_label`).
+- `venue_constraints`, `open_questions` — graphical-abstract specs and anything to confirm first.
+
+**Then gate**: present the artifact and ask explicitly —
+
+> "Here's the teaser brief (`teaser-prompt.yaml`) — it holds the drawing prompt, caption, output path, and Intro pointer in one place. **Start drawing from this, or adjust first?** Tell me what to change, or say 'draw it'."
+
+- Wait for `draw it` / `go` / `looks good` before generating any image.
+- If the user edits fields or asks for changes, update the YAML and re-present — loop until approval.
+- If the user says "you decide" / "use your defaults", proceed, but still write the artifact so the plan is on record.
+
+---
+
+## Step 5 — Draw the teaser from the YAML
+
+Generate the image from `generation_prompt`, honoring `layout`, `embodiment`, `environment`, `color_coding`, and any `venue_constraints`. Save it to `output_path`. If the result diverges from the brief, fix the brief first, then redraw — the YAML stays the source of truth, never the other way around.
+
+---
+
+## Step 6 — Drive the Intro reference (and placement) from the YAML
+
+With the image at `output_path`, the rest is mechanical and reads straight off the YAML — this is the payoff of consolidating in Step 4. Hand the YAML to an agent (or do it yourself) to:
+
+1. **Place the figure** — assemble the figure environment from `output_path` + `caption` + `figure_label`, positioned per `placement`.
+2. **Reference it in the Intro** — paste `intro_reference` into Introduction paragraph 1 or 2. The teaser must be **pointed to from prose** early — the reference invites the reviewer's abstract → Fig. 1 → contributions scan path explicitly.
+
+Phrasing options for the Intro pointer (whichever you store in `intro_reference`):
 
 - `(see Fig. 1)` — most terse
 - `As an example (Fig. 1), ...`
 - `Figure 1 illustrates how our system works.`
 - `In this paper, we propose ... (Figure 1).`
 
-Forward reference (figure number **before** the description) is the default everywhere in the paper.
+Forward reference (figure number **before** the description) is the default everywhere in the paper. The pointer's `\ref{...}` must match `figure_label`.
 
 ---
 
@@ -125,10 +165,12 @@ Forward reference (figure number **before** the description) is the default ever
 | "What should my teaser show?" | Pick a variant (Step 1): montage / pipeline+punchline / collage / single shot. |
 | "How long is the Fig. 1 caption?" | 3–6 sentences. |
 | "What goes in the caption?" | Name → value prop → panel pointers → scale → novelty → video → color (Step 3). |
-| "Where do I reference it?" | Intro paragraph 1–2, e.g. `(see Fig. 1)` (Step 4). |
+| "Where do I reference it?" | Intro paragraph 1–2, e.g. `(see Fig. 1)` (Step 6). |
 | "My contribution is a generalist policy." | Capability collage. |
 | "One iconic behavior carries the paper." | Single dramatic shot. |
 | "Is `we` allowed in the caption?" | Yes — modern convention (`We introduce …`). |
+| "Draw / generate my teaser." | First consolidate `teaser-prompt.yaml` and confirm before drawing (Step 4). |
+| "I have the YAML — now what?" | Draw from it (Step 5), then drive figure placement + Intro reference off it (Step 6). |
 
 ---
 
@@ -138,7 +180,9 @@ Forward reference (figure number **before** the description) is the default ever
 2. **Pick the variant** (Step 1) that matches.
 3. **Compose** with a single reading path, visible embodiment, and legible deployment context (Step 2).
 4. **Write the caption** as a promise: name + value prop + optional scale/novelty/video/color (Step 3).
-5. **Reference it** from Intro paragraph 1–2 (Step 4).
-6. **Sanity check** against the anti-pattern table — especially: no bare label, no undecoded color, no over-promise.
+5. **Consolidate `teaser-prompt.yaml`** — variant, layout, caption, generation prompt, output path, figure label, Intro pointer — as the single reference, and gate on user approval before drawing (Step 4).
+6. **Draw** from the YAML to `output_path` (Step 5).
+7. **Drive the downstream off the YAML** — place the figure, then reference it from Intro ¶1–2 (Step 6).
+8. **Sanity check** against the anti-pattern table — especially: no bare label, no undecoded color, no over-promise.
 </content>
 </invoke>
