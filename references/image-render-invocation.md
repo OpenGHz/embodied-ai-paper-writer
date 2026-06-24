@@ -1,10 +1,16 @@
 # Image-Render Invocation — How to Actually Call the Drawing Program
 
-**Purpose**: the concrete mechanics of generating a raster figure (teaser, architecture, conceptual diagram) through the **Codex `codex-image2` app-server bridge** — preflight, render, poll, finalize, verify.
+**Purpose**: the concrete mechanics of generating a raster figure (teaser, architecture, conceptual diagram) — endpoint check, render, finalize, verify.
 
-This file is the *plumbing* the teaser playbook keeps out of its prose: `teaser-figure-playbook.md` Step 5 supplies the **brief** (`teaser-prompt.yaml`) and the **acceptance bar**, and points here for the **call**. It is self-contained — the helper script ships in this repo at [`tools/figure_render_helper.py`](../tools/figure_render_helper.py) (pure Python standard library; no external skill or runtime required).
+This file is the *plumbing* the teaser playbook keeps out of its prose: `teaser-figure-playbook.md` Step 5 supplies the **brief** (`teaser-prompt.yaml`) and the **acceptance bar**, and points here for the **call**. Both bundled scripts are pure Python standard library — no third-party packages.
 
-**Requirements**: the `mcp__codex-image2__*` MCP bridge (the renderer) and the `codex` CLI on `PATH` (used by `preflight`). If the bridge is unavailable, this is not the renderer to use — hand the prompt to another image tool or draw by hand, and say so plainly.
+**Default renderer**: the REST adapter [`tools/images_api_render.py`](../tools/images_api_render.py), which POSTs to an OpenAI-compatible `images/generations` endpoint (`gpt-image-2` by default) and writes the PNG directly. No MCP bridge or `codex` CLI required — only an API key + endpoint (below). The Codex `codex-image2` MCP bridge is kept as an **alternative** (see "Alternative renderer").
+
+**Requirements (default path)**: an images endpoint reachable over HTTPS, configured via either —
+- `GPT_IMAGE2_API_KEY` + `GPT_IMAGE2_API_URL` (preferred — explicit, no Codex needed), or
+- a Codex install (`~/.codex/auth.json` `OPENAI_API_KEY` + the active provider `base_url` in `~/.codex/config.toml`), used only if the `GPT_IMAGE2_*` vars are unset.
+
+If neither resolves, this is not the renderer to use — say so plainly and hand the prompt to another image tool or draw by hand.
 
 ---
 
@@ -12,55 +18,64 @@ This file is the *plumbing* the teaser playbook keeps out of its prose: `teaser-
 
 | Name | Value | Meaning |
 |---|---|---|
-| `RENDERER` | `codex-image2` | Native image-generation bridge via local Codex app-server (`mcp__codex-image2__generate_start` / `generate_status`) |
-| `OPTIONAL_TEXT_CRITIC` | `mcp__codex__codex` | Optional text-only second opinion for layout/style checks |
-| `HELPER` | `"$SKILL_DIR/tools/figure_render_helper.py"` | This skill's bundled `preflight` / `finalize` / `verify` helper |
+| `RENDERER` | `tools/images_api_render.py` | Default: REST adapter → OpenAI-compatible `images/generations` |
+| `HELPER` | `tools/figure_render_helper.py` | Renderer-agnostic `finalize` / `verify` (+ a Codex-bridge `preflight`) |
 | `OUTPUT_DIR` | `figures/ai_generated/` | Where renders and receipts land (under the user's **workspace**, not the skill) |
+| `IMAGE_MODEL` | `gpt-image-2` | Override via `GPT_IMAGE2_MODEL`; size/quality via `GPT_IMAGE2_SIZE` / `GPT_IMAGE2_QUALITY` |
 | `TEXT_LANGUAGE` | `English` | Default figure-text language unless the user asks otherwise |
-| `NATIVE_IMAGE_REQUIREMENT` | `strict` | Accept ONLY native `imageGeneration` output; reject shell/Python/manual-bitmap fallbacks masquerading as generation |
+| `ALT_RENDERER` | `codex-image2` | Alternative: native bridge via `mcp__codex-image2__generate_start` / `generate_status` |
 
-The helper is a bundled tool, so it resolves like every other one — see **SKILL.md → "Bundled tools — Path resolution"** for the full rule. Each command block below carries the one-line resolver inline (Bash tool calls don't share shell state). `--workspace <cwd>` is always the user's **paper workspace**, never the skill dir.
+Both scripts are bundled tools, so they resolve like every other one — see **SKILL.md → "Bundled tools — Path resolution"**. Each command block below carries the one-line resolver inline (Bash tool calls don't share shell state). `<cwd>` / `--workspace` is always the user's **paper workspace**, never the skill dir.
 
 ---
 
-## Step A — Preflight (gate before rendering)
+## Step A — Preflight (check the endpoint resolves)
 
 ```bash
-HELPER="${CLAUDE_SKILL_DIR:-$(pwd)}/tools/figure_render_helper.py"; [ -f "$HELPER" ] || HELPER="tools/figure_render_helper.py"  # see SKILL.md → Bundled tools
-python3 "$HELPER" preflight \
-  --workspace <cwd> \
-  --json-out figures/ai_generated/preflight.json
+RENDER="${CLAUDE_SKILL_DIR:-$(pwd)}/tools/images_api_render.py"; [ -f "$RENDER" ] || RENDER="tools/images_api_render.py"  # see SKILL.md → Bundled tools
+mkdir -p figures/ai_generated
+python3 "$RENDER" check --json-out figures/ai_generated/render_check.json
 ```
 
-- Creates `figures/ai_generated/` if it does not exist.
-- Pings the `codex` app-server. Confirm the JSON says `ok=true` **before** calling the renderer; if not `ok=true` (codex CLI missing, ping failed/timed out), stop and say so clearly.
+`check` resolves the config **without making a network call** and reports `mode`:
+
+| `mode` | Meaning | Action |
+|---|---|---|
+| `env` | key + endpoint from `GPT_IMAGE2_API_KEY` / `GPT_IMAGE2_API_URL` | proceed |
+| `codex` | both from the Codex config (`~/.codex/auth.json` + `config.toml`) | proceed |
+| `mixed` | one from env, one from Codex config | proceed (usable) |
+| `unavailable` | key and/or endpoint unresolved (see `errors`) | configure the API, or use the alternative renderer / draw by hand |
+
+Confirm `check` exits 0 (`available: true`) **before** rendering. On `unavailable`, the `errors` array says exactly what's missing. (`python3 "$RENDER" endpoint` is the quick variant — just prints the resolved URL + sources.)
+
+> When driven from the teaser playbook, this check is already run at its Step 4 gate and its `mode` recorded in `teaser-prompt.yaml`'s `render` block — `check` is idempotent and network-free, so re-running it here is harmless, but you can skip it if the YAML already says `render.mode` is available.
 
 ---
 
-## Step B — Render through the bridge
+## Step B — Render (default: REST adapter)
 
-Call `mcp__codex-image2__generate_start` with:
+Write the prompt to a file (avoids shell-quoting issues with long, multi-line prompts), then generate:
 
-| Param | Example | Notes |
-|---|---|---|
-| `prompt` | the final image prompt (your `generation_prompt`) | fully specified: components, layout, flow, labels, style, what to avoid |
-| `cwd` | project root / paper workspace | |
-| `outputPath` | `figures/ai_generated/figure_v1.png` | bump `_vN` per round |
-| `system` | `Academic paper figure. Prefer crisp English labels.` | short renderer instruction |
-| `timeoutSeconds` | `180` | bounded render timeout |
+```bash
+RENDER="${CLAUDE_SKILL_DIR:-$(pwd)}/tools/images_api_render.py"; [ -f "$RENDER" ] || RENDER="tools/images_api_render.py"
+# prompt body = your generation_prompt; system = short style preamble
+python3 "$RENDER" generate \
+  --prompt-file figures/ai_generated/prompt.txt \
+  --system "Academic paper figure. Clean, paper-ready, crisp English labels." \
+  --out figures/ai_generated/figure_v1.png \
+  --size 1024x1024 --quality high
+```
 
-Then poll `mcp__codex-image2__generate_status` with bounded waits until either:
-
-- `done=true` and `status=completed`, or
-- `done=true` and `status=failed`.
-
-If generation fails, surface the bridge error directly — do not hide it or substitute a fallback bitmap.
+- Bump `figure_vN.png` per round (quick mode stops at v1; loop mode iterates — see playbook Step 5).
+- On success it writes the PNG and prints a JSON receipt (`ok=true`, `outputPath`, `model`, `size`, `revisedPrompt`, …).
+- On failure (HTTP error, network error, non-PNG payload) it prints the error and exits 1 — surface that directly, don't fake an image.
+- `--size` / `--quality` / `--model` default to the `GPT_IMAGE2_*` env values; pass flags to override per render.
 
 ---
 
 ## Step C — Finalize and verify (on acceptance)
 
-When a render is accepted (quick mode: the first good one; loop mode: score ≥ target):
+When a render is accepted (quick mode: the first good one; loop mode: score ≥ target), use the renderer-agnostic helper:
 
 ```bash
 HELPER="${CLAUDE_SKILL_DIR:-$(pwd)}/tools/figure_render_helper.py"; [ -f "$HELPER" ] || HELPER="tools/figure_render_helper.py"  # see SKILL.md → Bundled tools
@@ -94,11 +109,26 @@ python3 "$HELPER" verify \
 
 ---
 
+## Alternative renderer — Codex `codex-image2` MCP bridge
+
+Use this only when the REST endpoint is unavailable but the Codex bridge is installed. Preflight with the helper's Codex-aware check, then render through the MCP bridge:
+
+```bash
+HELPER="${CLAUDE_SKILL_DIR:-$(pwd)}/tools/figure_render_helper.py"; [ -f "$HELPER" ] || HELPER="tools/figure_render_helper.py"
+python3 "$HELPER" preflight --workspace <cwd> --json-out figures/ai_generated/preflight.json   # pings the codex app-server; needs ok=true
+```
+
+Then call `mcp__codex-image2__generate_start` with `prompt` (your `generation_prompt`), `cwd`, `outputPath` (`figures/ai_generated/figure_v1.png`), `system` (`Academic paper figure. Prefer crisp English labels.`), `timeoutSeconds` (`180`); poll `mcp__codex-image2__generate_status` until `done=true` with `status=completed` (or `failed`). Accept only native `imageGeneration` output — reject any shell/manual-bitmap fallback. On acceptance, hand the PNG to Step C (finalize/verify) exactly as above.
+
+---
+
 ## Output structure
 
 ```text
 figures/ai_generated/
-├── preflight.json     # preflight receipt (ok=true gate)
+├── prompt.txt         # the generation prompt (default path, --prompt-file)
+├── render_check.json  # default path: config-resolution verdict (mode: env|codex|mixed|unavailable)
+├── preflight.json     # alt-path only: codex app-server ping receipt
 ├── figure_v1.png      # iteration 1 (quick mode stops here)
 ├── figure_v2.png      # iteration 2 (loop mode)
 ├── figure_final.png   # accepted version (copy of best)
@@ -111,9 +141,9 @@ figures/ai_generated/
 
 ## Invocation rules
 
-1. Use the `codex-image2` bridge **only for native image generation**; reject any shell/Python/manual-bitmap fallback dressed up as generation.
-2. If the bridge says native generation is unavailable, surface that honestly — do not fake an image.
-3. Gate on `preflight` `ok=true` before rendering; run `verify` before claiming success.
+1. Default to the REST adapter (`images_api_render.py`); fall back to the `codex-image2` bridge only when the endpoint is unconfigured but the bridge is installed.
+2. Gate before rendering: REST path → `endpoint` exits 0; bridge path → `preflight` `ok=true`. Run `verify` before claiming success.
+3. If neither renderer is available, say so honestly — do not fake an image or pass off a hand-built bitmap as a generated one.
 4. Keep figure text in **English** unless the user requested another language.
-5. Report bridge errors directly instead of hiding them.
-6. The helper and bridge are wiring; the figure's **content/style brief and acceptance bar live in `teaser-figure-playbook.md`** (Steps 2 & 5) and `teaser-prompt.yaml`.
+5. Report renderer errors (HTTP/network/bridge) directly instead of hiding them.
+6. The scripts are wiring; the figure's **content/style brief and acceptance bar live in `teaser-figure-playbook.md`** (Steps 2 & 5) and `teaser-prompt.yaml`.

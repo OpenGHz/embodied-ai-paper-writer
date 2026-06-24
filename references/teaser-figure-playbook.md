@@ -117,11 +117,24 @@ This is the teaser-specific instance of the skill's PRE-DRAFT CHECKPOINT discipl
 - `output_path`, `figure_label`, `placement` — where the drawn image lives and how it sits in the paper.
 - `caption` — the paste-ready Step 3 promise caption.
 - `intro_reference` — the paste-ready Intro pointer (its `\ref{}` must match `figure_label`).
+- `render` — the preferred renderer + its availability mode (filled by the check below).
 - `venue_constraints`, `review`, `open_questions` — graphical-abstract specs, the draw→review→refine acceptance bar, and anything to confirm first.
+
+**Check the renderer here (before the gate).** Don't wait until Step 5 to discover the API isn't configured — run the config check now and record the result in the YAML's `render` block, so the gate can report whether drawing is actually possible:
+
+```bash
+RENDER="${CLAUDE_SKILL_DIR:-$(pwd)}/tools/images_api_render.py"; [ -f "$RENDER" ] || RENDER="tools/images_api_render.py"  # see SKILL.md → Bundled tools
+python3 "$RENDER" check --json-out figures/ai_generated/render_check.json
+```
+
+Map the `mode` from the verdict into `render:` in the YAML:
+
+- `env` / `codex` / `mixed` → set `render.renderer: images_api_render` and `render.mode: <mode>` (default REST path is usable).
+- `unavailable` → set `render.mode: unavailable`. Either switch `render.renderer: codex-image2` (if the MCP bridge is installed) or flag at the gate that the user must configure `GPT_IMAGE2_API_KEY` + `GPT_IMAGE2_API_URL` (or draw by hand). See [`image-render-invocation.md`](image-render-invocation.md) for the full table.
 
 **Then gate**: present the artifact and ask explicitly —
 
-> "Here's the teaser brief (`teaser-prompt.yaml`) — it holds the drawing prompt, caption, output path, and Intro pointer in one place. **Start drawing from this, or adjust first?** Tell me what to change, or say 'draw it'."
+> "Here's the teaser brief (`teaser-prompt.yaml`) — it holds the drawing prompt, caption, output path, Intro pointer, and the renderer status (`render.mode: <mode>`). **Start drawing from this, or adjust first?** Tell me what to change, or say 'draw it'." *(If `render.mode` is `unavailable`, say so here and ask how to proceed.)*
 
 - Wait for `draw it` / `go` / `looks good` before generating any image.
 - If the user edits fields or asks for changes, update the YAML and re-present — loop until approval.
@@ -131,9 +144,9 @@ This is the teaser-specific instance of the skill's PRE-DRAFT CHECKPOINT discipl
 
 ## Step 5 — Draw the teaser from the YAML (quick by default)
 
-Generate the image from `generation_prompt`, honoring `layout`, `embodiment`, `environment`, `color_coding`, `style`, and any `venue_constraints`. Save it to `output_path`. (This playbook supplies the brief and the acceptance bar; a dedicated image tool executes the render.)
+Generate the image from `generation_prompt`, honoring `layout`, `embodiment`, `environment`, `color_coding`, `style`, and any `venue_constraints`. Use the renderer recorded in `render` (renderer/model/size/quality) — its availability was already confirmed at the Step 4 gate, so there's no surprise here. Save it to `output_path`. (This playbook supplies the brief and the acceptance bar; the image tool executes the render.)
 
-**To actually call a renderer** (the Codex `codex-image2` bridge — preflight → generate → poll → finalize → verify), see [`image-render-invocation.md`](image-render-invocation.md). If that bridge isn't installed, hand the `generation_prompt` to whatever image tool you have, or draw by hand.
+**To actually call the renderer** (default: the REST adapter `tools/images_api_render.py` → render → finalize → verify; Codex `codex-image2` bridge as alternative), see [`image-render-invocation.md`](image-render-invocation.md). If `render.mode` was `unavailable` and not resolved at the gate, hand the `generation_prompt` to whatever image tool you have, or draw by hand.
 
 **Default: one quick render.** Produce a single image and hand it back — do **not** spin a review-and-refine loop unless asked. Most teasers go through manual tweaking anyway, so a fast first draft is usually what the user wants. Still apply the Step 2 style standards in the prompt so the one shot lands close.
 
@@ -223,7 +236,7 @@ Forward reference (figure number **before** the description) is the default ever
 2. **Pick the variant** (Step 1) that matches.
 3. **Compose** with a single reading path, visible embodiment, and legible deployment context (Step 2).
 4. **Write the caption** as a promise: name + value prop + optional scale/novelty/video/color (Step 3).
-5. **Consolidate `teaser-prompt.yaml`** — variant, layout, caption, generation prompt, output path, figure label, Intro pointer — as the single reference, and gate on user approval before drawing (Step 4).
+5. **Consolidate `teaser-prompt.yaml`** — variant, layout, caption, generation prompt, output path, figure label, Intro pointer — as the single reference; **run the renderer `check` and record `render.mode`**; then gate on user approval before drawing (Step 4).
 6. **Draw** from the YAML to `output_path` — one quick render by default; loop to review-score-refine only on request (Step 5).
 7. **Drive the downstream off the YAML** — place the figure, then reference it from Intro ¶1–2 (Step 6).
 8. **Sanity check** against the anti-pattern table — especially: no bare label, no undecoded color, no over-promise.

@@ -45,6 +45,13 @@ generation_prompt: >             # the actual text handed to the image model OR 
   mobile robot to take food from an open fridge. Right: the same robot
   autonomously ... Concrete on scene, framing, lighting, style.
 
+render:                          # preferred renderer + availability (set at Step 4 via `images_api_render.py check`)
+  renderer: images_api_render    # default REST adapter | codex-image2 (MCP bridge alternative)
+  mode: env                      # env | codex | mixed | unavailable (from `check`)
+  model: gpt-image-2             # override via GPT_IMAGE2_MODEL
+  size: 1024x1024                # override via GPT_IMAGE2_SIZE
+  quality: high                  # override via GPT_IMAGE2_QUALITY
+
 # --- outputs & downstream wiring (consumed after the image is drawn) ---
 output_path: figures/teaser.pdf  # where the drawn image is/will be saved
 figure_label: fig:teaser         # LaTeX \label — the Intro pointer must match this

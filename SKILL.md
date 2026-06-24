@@ -658,7 +658,7 @@ Step 5: Prioritize fixes
 | `references/figures-tables-playbook.md` | 8 figure roles (F1–F8), teaser ingredients, table-caption-as-takeaway, panel notation, statistical disclosure | 19 KB |
 | `references/teaser-figure-playbook.md` | F1 teaser / graphical abstract deep-dive: naming, 4 visual variants, image composition + conference visual-style standards, caption-as-promise, Intro reference, drawing-prompt artifact + approval gate, draw→review→refine loop, anti-patterns | 10 KB |
 | `references/teaser-prompt.template.yaml` | Copy-to-`teaser-prompt.yaml` template: the single reference consolidating variant/layout/caption/style/generation-prompt/output-path/Intro-pointer/review-bar for the teaser | 2 KB |
-| `references/image-render-invocation.md` | Renderer plumbing (Codex `codex-image2` bridge), self-contained: preflight → generate_start/generate_status → finalize → verify via local `tools/figure_render_helper.py`, output structure, native-only rules | 4 KB |
+| `references/image-render-invocation.md` | Renderer plumbing, self-contained: default REST adapter (`tools/images_api_render.py` → `images/generations`) with the Codex `codex-image2` MCP bridge as alternative; endpoint check → render → finalize/verify via `tools/figure_render_helper.py`, output structure, rules | 6 KB |
 | `references/language-phrasebank.md` | Section A–K rhetorical phrasebook: openers, contributions, pivots, hedging, connectors, anti-patterns | 24 KB |
 | `references/flow-transitions.md` | 6-move paper arc, section openers, contribution-restatement spiral, pivot family, inter-paragraph connectors | 22 KB |
 | `references/closing-appendix-playbook.md` | Conclusion 3-move recap, Limitations admit-and-propose, Appendix TOC, hyperparameter conventions, Author Contributions | 25 KB |
@@ -683,7 +683,8 @@ This skill ships executable helpers under `tools/`. They are invoked by the scen
 |---|---|---|
 | `tools/audit_conventions.sh` | Scenario E Step 2.5 (mandatory convention sweeps) | Recursively follows `\input{}` from `main.tex` and runs the rule 14–22 sweeps; `--strict`, `--list`. Reads per-paper `audit_conventions.conf` (schema: `tools/audit_conventions.example.conf`). |
 | `tools/page_audit.sh` | On request / submission prep | Reports CoRL-style page-budget compliance of the built PDF (`--pdf`, `--limit`). |
-| `tools/figure_render_helper.py` | `references/image-render-invocation.md` (teaser draw) | `preflight` / `finalize` / `verify` around a Codex image render. |
+| `tools/images_api_render.py` | `references/image-render-invocation.md` (teaser draw — **default renderer**) | `generate` an image via an OpenAI-compatible `images/generations` endpoint (`gpt-image-2`); `check` reports the config mode (env / codex / mixed / unavailable) before rendering; `endpoint` prints the resolved URL+auth. |
+| `tools/figure_render_helper.py` | `references/image-render-invocation.md` (teaser draw) | Renderer-agnostic `finalize` / `verify` of figure artifacts (+ a Codex-bridge `preflight` for the alternative path). |
 
 ### Path resolution (applies to every bundled tool)
 
