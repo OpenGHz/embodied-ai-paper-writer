@@ -199,6 +199,7 @@ Step 2: Confirm the role
 
 Step 3: Draft using the matching template
   → F1: name + value prop + scale flex + (optional) novelty + (optional) URL
+       (full teaser playbook: teaser-figure-playbook.md)
   → F2: 3-4 components with action verbs + data flow
   → F3: SKUs + dimensions + control rates
   → F4: task names locked (must match across figure / table / prose)
@@ -654,6 +655,7 @@ Step 5: Prioritize fixes
 | `references/method-relatedwork-playbook.md` | Related Work 3-act narrative, Method system-name commitment, equation sandwich, sub-corpus matching | 18 KB |
 | `references/experiments-results-playbook.md` | Question-list opener, baseline framing, ablation pairwise narration, sim-vs-real tagging, hardware paragraph | 22 KB |
 | `references/figures-tables-playbook.md` | 8 figure roles (F1–F8), teaser ingredients, table-caption-as-takeaway, panel notation, statistical disclosure | 19 KB |
+| `references/teaser-figure-playbook.md` | F1 teaser / graphical abstract deep-dive: naming, 4 visual variants, image composition, caption-as-promise, Intro reference, anti-patterns | 8 KB |
 | `references/language-phrasebank.md` | Section A–K rhetorical phrasebook: openers, contributions, pivots, hedging, connectors, anti-patterns | 24 KB |
 | `references/flow-transitions.md` | 6-move paper arc, section openers, contribution-restatement spiral, pivot family, inter-paragraph connectors | 22 KB |
 | `references/closing-appendix-playbook.md` | Conclusion 3-move recap, Limitations admit-and-propose, Appendix TOC, hyperparameter conventions, Author Contributions | 25 KB |

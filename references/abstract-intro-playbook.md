@@ -187,11 +187,7 @@ When making a precedence claim, ALWAYS hedge with `To our knowledge` or `to the 
 
 ### Teaser figure reference
 
-Reference `Figure 1` somewhere in paragraphs 1–2 of the intro. Use one of:
-- `(see Fig. 1)` — most terse
-- `As an example (Fig. 1), ...`
-- `Figure 1 illustrates how our system works.`
-- `In this paper, we propose ... (Figure 1).`
+Reference `Figure 1` somewhere in paragraphs 1–2 of the intro (e.g. `(see Fig. 1)`). For the phrasing options and the full teaser playbook, see `teaser-figure-playbook.md` (Step 4 — Reference the teaser in the Intro).
 
 ### Acknowledging-but-distinguishing transitions
 

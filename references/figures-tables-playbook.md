@@ -46,23 +46,9 @@ Embodied-AI papers cluster figures into 8 recurring roles. The role determines c
 
 ## Step 2 — Write the teaser (Figure 1) as a promise
 
-The teaser is read first by every reviewer. Caption ingredients in this order:
+The teaser is read first by every reviewer; its caption names the system, states the headline capability, and optionally flags scale/novelty/video — 3–6 sentences.
 
-1. **System name in bold or small caps**: `**OpenVLA**`, `**Mobile ALOHA**`, `EUREKA`
-2. **One-sentence value proposition**: `We introduce {SystemName}, a {short noun phrase} that {headline capability}.`
-3. **(Optional) panel pointers** if multi-image: `Left: ... Right: ...`
-4. **(Optional) scale flex**: `trained on 970k robot episodes`, `21 institutions across the globe`, `$32k including onboard power and compute`
-5. **(Optional) novelty flag**: `for the first time, unlocks ...`, `the first open-source ...`
-6. **(Optional) video URL**: `Parkour videos at https://...`, `Videos are on the project website.`
-
-Four teaser visual variants:
-
-| Variant | When to use |
-|---|---|
-| **Deployment montage** (robot in 2–6 environments) | Capability generalizes across scenes |
-| **Pipeline diagram + punchline image** | Method needs explanation AND a "look it works" shot |
-| **Capability collage** (small grid of tasks) | The contribution is a generalist policy / system |
-| **Single dramatic shot** | One iconic behavior carries the paper (e.g., EUREKA pen-spinning) |
+**For the full teaser playbook, see `teaser-figure-playbook.md`** — the four visual variants (deployment montage / pipeline+punchline / capability collage / single dramatic shot), image composition, the caption-as-promise ingredient list, the Intro reference, and teaser-specific anti-patterns.
 
 ---
 
@@ -395,7 +381,7 @@ This 5-step rhythm is the standard structure of Results paragraphs in top embodi
 # Construction workflow
 
 1. **Pick the figure type** (Step 1: F1–F8). Each role has its own length budget.
-2. **For F1 (teaser)**: name + value prop + scale flex + novelty flag (Step 2).
+2. **For F1 (teaser)**: pick a visual variant, then caption as a promise — see `teaser-figure-playbook.md`.
 3. **For F2 (architecture)**: decompose into 3–4 components, name each with action verb (Step 3).
 4. **For F3 (hardware)**: list SKUs, dimensions, control rates (Step 4).
 5. **For F4 (tasks)**: lock task names; use them identically in tables and prose (Step 5).
