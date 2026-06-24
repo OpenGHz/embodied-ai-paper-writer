@@ -14,19 +14,20 @@ This file is the *plumbing* the teaser playbook keeps out of its prose: `teaser-
 |---|---|---|
 | `RENDERER` | `codex-image2` | Native image-generation bridge via local Codex app-server (`mcp__codex-image2__generate_start` / `generate_status`) |
 | `OPTIONAL_TEXT_CRITIC` | `mcp__codex__codex` | Optional text-only second opinion for layout/style checks |
-| `HELPER` | `tools/figure_render_helper.py` | This repo's `preflight` / `finalize` / `verify` helper |
-| `OUTPUT_DIR` | `figures/ai_generated/` | Where renders and receipts land |
+| `HELPER` | `"$SKILL_DIR/tools/figure_render_helper.py"` | This skill's bundled `preflight` / `finalize` / `verify` helper |
+| `OUTPUT_DIR` | `figures/ai_generated/` | Where renders and receipts land (under the user's **workspace**, not the skill) |
 | `TEXT_LANGUAGE` | `English` | Default figure-text language unless the user asks otherwise |
 | `NATIVE_IMAGE_REQUIREMENT` | `strict` | Accept ONLY native `imageGeneration` output; reject shell/Python/manual-bitmap fallbacks masquerading as generation |
 
-All helper calls below are `python3 tools/figure_render_helper.py <subcommand>` (adjust the path if you run from outside the repo root).
+The helper is a bundled tool, so it resolves like every other one — see **SKILL.md → "Bundled tools — Path resolution"** for the full rule. Each command block below carries the one-line resolver inline (Bash tool calls don't share shell state). `--workspace <cwd>` is always the user's **paper workspace**, never the skill dir.
 
 ---
 
 ## Step A — Preflight (gate before rendering)
 
 ```bash
-python3 tools/figure_render_helper.py preflight \
+HELPER="${CLAUDE_SKILL_DIR:-$(pwd)}/tools/figure_render_helper.py"; [ -f "$HELPER" ] || HELPER="tools/figure_render_helper.py"  # see SKILL.md → Bundled tools
+python3 "$HELPER" preflight \
   --workspace <cwd> \
   --json-out figures/ai_generated/preflight.json
 ```
@@ -62,7 +63,8 @@ If generation fails, surface the bridge error directly — do not hide it or sub
 When a render is accepted (quick mode: the first good one; loop mode: score ≥ target):
 
 ```bash
-python3 tools/figure_render_helper.py finalize \
+HELPER="${CLAUDE_SKILL_DIR:-$(pwd)}/tools/figure_render_helper.py"; [ -f "$HELPER" ] || HELPER="tools/figure_render_helper.py"  # see SKILL.md → Bundled tools
+python3 "$HELPER" finalize \
   --workspace <cwd> \
   --best-image figures/ai_generated/figure_vN.png \
   --caption "Replace with a paper-ready caption." \
@@ -70,16 +72,16 @@ python3 tools/figure_render_helper.py finalize \
   --score 9 \
   --review-summary "Accepted; labels and arrows are paper-ready."
 
-python3 tools/figure_render_helper.py verify \
+python3 "$HELPER" verify \
   --workspace <cwd> \
   --json-out figures/ai_generated/verify.json
 ```
 
-`finalize` promotes the best image to `figure_final.png` and writes `latex_include.tex` + `review_log.json` (`--caption` / `--label` default to placeholders if omitted). Always run `verify` before claiming success.
+`finalize` promotes the best image to `figure_final.png` and writes `latex_include.tex` + `review_log.json` (`--caption` / `--label` default to placeholders if omitted). Always run `verify` before claiming success. All artifacts land under the user's workspace (`<cwd>/figures/ai_generated/`), never inside the skill dir.
 
 **Repair path** — if rendering succeeded but the final artifacts were skipped, re-run `finalize` then `verify` (same commands) to emit them.
 
-`finalize` writes this LaTeX include for you (`tools/figure_render_helper.py` → `latex_include.tex`):
+`finalize` writes this LaTeX include for you (`figure_render_helper.py` → `latex_include.tex`):
 
 ```latex
 \begin{figure*}[t]

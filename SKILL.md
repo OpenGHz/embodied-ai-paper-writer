@@ -237,15 +237,16 @@ Step 2: Read each drafted section through 4 lenses
   → Figure/table coupling: are all main-text figures referenced?
 
 Step 2.5: Run the mandatory convention sweeps (rules 14 + 15 + 16 + 17 + 18 + 19 + 20 + 21 + 22 + standing rules)
-  **Preferred path**: invoke the tool that automates these sweeps:
-    `<skill-dir>/tools/audit_conventions.sh --strict`
+  **Preferred path**: invoke the tool that automates these sweeps (resolve
+  `$SKILL_DIR` per "Bundled tools — Path resolution"):
+    `bash "$SKILL_DIR/tools/audit_conventions.sh" --strict`
   Run from the paper directory (with main.tex). The tool follows every
   `\input{...}` (including symlinked figure dirs via `find -L`), so it
   catches drift in `sections/*.tex`, `figures/*.tex`, `figures/*/*.tex`,
   and any other `\input`'d file. It auto-loads `audit_conventions.conf`
   from the paper dir if present (per-paper config for project-specific
   old labels, system names, scope-tag modifiers). See
-  `tools/audit_conventions.example.conf` for the schema. Run
+  `$SKILL_DIR/tools/audit_conventions.example.conf` for the schema. Run
   `audit_conventions.sh --list` to list available sweeps.
 
   **Why automation matters**: manual grep over `sections/*.tex` only
@@ -671,6 +672,38 @@ Step 5: Prioritize fixes
 | `references/research/06-flow-rhetoric.md` | Raw flow / transition extraction | 76 KB |
 | `references/research/07-conclusion-limitations.md` | Raw closing sections extraction | 28 KB |
 | `references/research/08-appendix.md` | Raw appendix extraction | 29 KB |
+
+---
+
+## Bundled tools — what they are and how to run them
+
+This skill ships executable helpers under `tools/`. They are invoked by the scenarios above (or on request):
+
+| Tool | Used by | Purpose |
+|---|---|---|
+| `tools/audit_conventions.sh` | Scenario E Step 2.5 (mandatory convention sweeps) | Recursively follows `\input{}` from `main.tex` and runs the rule 14–22 sweeps; `--strict`, `--list`. Reads per-paper `audit_conventions.conf` (schema: `tools/audit_conventions.example.conf`). |
+| `tools/page_audit.sh` | On request / submission prep | Reports CoRL-style page-budget compliance of the built PDF (`--pdf`, `--limit`). |
+| `tools/figure_render_helper.py` | `references/image-render-invocation.md` (teaser draw) | `preflight` / `finalize` / `verify` around a Codex image render. |
+
+### Path resolution (applies to every bundled tool)
+
+**The tools live in the skill's install directory, which is NOT your working directory once the skill is installed** — your CWD is the user's paper (where `main.tex` / `main.pdf` live). A bare `tools/...` path only works when you happen to be running from the skill repo root. So resolve the skill dir first, then call the tool by absolute path. The tool **reads from the skill dir but operates on the paper in your CWD**.
+
+```bash
+# Resolve this skill's dir. $CLAUDE_SKILL_DIR is set by Claude Code during a skill
+# invocation; fall back to the repo root, else substitute the absolute skill path
+# you know from where you read SKILL.md. (Bash tool calls don't share shell state —
+# include this line in the SAME block as the tool call, or paste the absolute path.)
+SKILL_DIR="${CLAUDE_SKILL_DIR:-$(pwd)}"
+[ -f "$SKILL_DIR/tools/audit_conventions.sh" ] || SKILL_DIR="/abs/path/to/embodied-ai-paper-writer"
+
+# Then invoke a tool by absolute path, run from the paper dir:
+bash "$SKILL_DIR/tools/audit_conventions.sh" --strict
+bash "$SKILL_DIR/tools/page_audit.sh" --pdf main.pdf --limit 8
+python3 "$SKILL_DIR/tools/figure_render_helper.py" preflight --workspace "$(pwd)"
+```
+
+Every `<skill-dir>/tools/...` or `tools/...` reference elsewhere in this skill means `"$SKILL_DIR/tools/..."` resolved this way. `references/image-render-invocation.md` applies the same convention with its own `$HELPER` shorthand.
 
 ---
 
