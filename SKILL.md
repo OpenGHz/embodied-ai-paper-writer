@@ -657,6 +657,7 @@ Step 5: Prioritize fixes
 | `references/figures-tables-playbook.md` | 8 figure roles (F1–F8), teaser ingredients, table-caption-as-takeaway, panel notation, statistical disclosure | 19 KB |
 | `references/teaser-figure-playbook.md` | F1 teaser / graphical abstract deep-dive: naming, 4 visual variants, image composition + conference visual-style standards, caption-as-promise, Intro reference, drawing-prompt artifact + approval gate, draw→review→refine loop, anti-patterns | 10 KB |
 | `references/teaser-prompt.template.yaml` | Copy-to-`teaser-prompt.yaml` template: the single reference consolidating variant/layout/caption/style/generation-prompt/output-path/Intro-pointer/review-bar for the teaser | 2 KB |
+| `references/image-render-invocation.md` | Renderer plumbing (Codex `codex-image2` bridge), self-contained: preflight → generate_start/generate_status → finalize → verify via local `tools/figure_render_helper.py`, output structure, native-only rules | 4 KB |
 | `references/language-phrasebank.md` | Section A–K rhetorical phrasebook: openers, contributions, pivots, hedging, connectors, anti-patterns | 24 KB |
 | `references/flow-transitions.md` | 6-move paper arc, section openers, contribution-restatement spiral, pivot family, inter-paragraph connectors | 22 KB |
 | `references/closing-appendix-playbook.md` | Conclusion 3-move recap, Limitations admit-and-propose, Appendix TOC, hyperparameter conventions, Author Contributions | 25 KB |

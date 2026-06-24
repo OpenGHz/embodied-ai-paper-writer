@@ -131,7 +131,9 @@ This is the teaser-specific instance of the skill's PRE-DRAFT CHECKPOINT discipl
 
 ## Step 5 — Draw the teaser from the YAML (quick by default)
 
-Generate the image from `generation_prompt`, honoring `layout`, `embodiment`, `environment`, `color_coding`, `style`, and any `venue_constraints`. Save it to `output_path`. (If you have a dedicated image-generation skill/tool, that tool executes the render; this playbook supplies the brief and the acceptance bar.)
+Generate the image from `generation_prompt`, honoring `layout`, `embodiment`, `environment`, `color_coding`, `style`, and any `venue_constraints`. Save it to `output_path`. (This playbook supplies the brief and the acceptance bar; a dedicated image tool executes the render.)
+
+**To actually call a renderer** (the Codex `codex-image2` bridge — preflight → generate → poll → finalize → verify), see [`image-render-invocation.md`](image-render-invocation.md). If that bridge isn't installed, hand the `generation_prompt` to whatever image tool you have, or draw by hand.
 
 **Default: one quick render.** Produce a single image and hand it back — do **not** spin a review-and-refine loop unless asked. Most teasers go through manual tweaking anyway, so a fast first draft is usually what the user wants. Still apply the Step 2 style standards in the prompt so the one shot lands close.
 
