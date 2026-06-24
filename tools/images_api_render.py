@@ -210,6 +210,28 @@ def compose_prompt(prompt: str, system: str | None) -> str:
     return body
 
 
+def download_image(url: str, timeout: int) -> bytes:
+    """Fetch image bytes from a hosted-image `url` returned by some endpoints.
+
+    OpenAI-compatible image endpoints may return either base64 (`b64_json`) or a
+    hosted `url` in `data[0]`. For the url variant we download the bytes here.
+    A browser-like User-Agent is required: some image hosts return HTTP 403 to a
+    bare urllib request. Proxies in the environment are honored automatically.
+    """
+    req = urllib.request.Request(
+        url,
+        headers={"User-Agent": "Mozilla/5.0", "Accept": "image/*,*/*"},
+        method="GET",
+    )
+    try:
+        with urllib.request.urlopen(req, timeout=min(timeout, 180)) as resp:
+            return resp.read()
+    except urllib.error.HTTPError as exc:
+        raise FallbackError(f"HTTP {exc.code} downloading image url {url[:120]}")
+    except urllib.error.URLError as exc:
+        raise FallbackError(f"network error downloading image url {url[:120]}: {exc}")
+
+
 def generate_via_rest(
     *,
     prompt: str,
@@ -255,14 +277,31 @@ def generate_via_rest(
         raise FallbackError(f"network error calling {endpoint}: {exc}")
 
     data = body.get("data") or []
-    if not data or "b64_json" not in data[0]:
+    if not data:
         raise FallbackError(
             f"unexpected response from {endpoint}: {json.dumps(body)[:400]}"
         )
 
-    png_bytes = base64.b64decode(data[0]["b64_json"])
+    # Accept both standard image-response shapes: inline base64 (`b64_json`) or a
+    # hosted `url` (which we then download). Endpoints differ in their default,
+    # and forcing `response_format` is avoided — some providers reject it and
+    # others slow down / time out under base64. So handle whatever comes back.
+    item = data[0]
+    img_source: str
+    if item.get("b64_json"):
+        png_bytes = base64.b64decode(item["b64_json"])
+        img_source = "b64_json"
+    elif item.get("url"):
+        png_bytes = download_image(item["url"], timeout)
+        img_source = "url"
+    else:
+        raise FallbackError(
+            f"response from {endpoint} has neither b64_json nor url in data[0]: "
+            f"{json.dumps(body)[:400]}"
+        )
+
     if not png_bytes.startswith(PNG_SIG):
-        raise FallbackError("decoded payload is not a PNG image")
+        raise FallbackError("downloaded/decoded payload is not a PNG image")
 
     output_path = output_path.expanduser().resolve()
     output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -274,7 +313,8 @@ def generate_via_rest(
         "model": body.get("model", model),
         "size": body.get("size", size),
         "quality": body.get("quality", quality),
-        "revisedPrompt": data[0].get("revised_prompt"),
+        "revisedPrompt": item.get("revised_prompt"),
+        "imageSource": img_source,
         "nativeToolConfirmed": True,
         "fallback": "rest",
         "endpoint": endpoint,

@@ -67,9 +67,13 @@ python3 "$RENDER" generate \
 ```
 
 - Bump `figure_vN.png` per round (quick mode stops at v1; loop mode iterates — see playbook Step 5).
-- On success it writes the PNG and prints a JSON receipt (`ok=true`, `outputPath`, `model`, `size`, `revisedPrompt`, …).
+- On success it writes the PNG and prints a JSON receipt (`ok=true`, `outputPath`, `model`, `size`, `revisedPrompt`, `imageSource` (`b64_json`|`url`), …).
 - On failure (HTTP error, network error, non-PNG payload) it prints the error and exits 1 — surface that directly, don't fake an image.
 - `--size` / `--quality` / `--model` default to the `GPT_IMAGE2_*` env values; pass flags to override per render.
+
+> **A render is slow — background it.** One high-quality render commonly takes **several minutes** and the adapter's own request timeout is **540 s (9 min)** by default (`GPT_IMAGE2_TIMEOUT_SEC`). When you drive this from an agent/harness whose per-command timeout is shorter (often 1–2 min), run the `generate` call **detached / in the background** (or raise the tool timeout to ≥ 10 min) and poll for the PNG — otherwise the command is killed mid-render with no output. It is not hung; it is waiting on the endpoint.
+
+> **Both response shapes are handled.** OpenAI-compatible endpoints return the image either inline as base64 (`data[0].b64_json`) or as a hosted `url`; the adapter accepts both (downloading the `url` with a browser User-Agent when needed) and reports which via `imageSource`. It does **not** force `response_format` — some providers reject it, and some slow down or time out when forced to base64. If your endpoint times out only at high quality, try `--quality medium` or a smaller `--size` first.
 
 ---
 
