@@ -21,6 +21,7 @@ Requires: matplotlib, Pillow, PyYAML (beyond the standard library).
 from __future__ import annotations
 
 import argparse
+import fnmatch
 import os
 import re
 import sys
@@ -149,8 +150,16 @@ def collect_panels(cfg: dict, base: Path) -> list[dict]:
         row_dir = (base / row["dir"]).resolve()
         if not row_dir.is_dir():
             raise SystemExit(f"error: image dir not found for task '{row.get('task')}': {row_dir}")
+        # Per-row exclude: list of filename glob patterns to drop (e.g. failure
+        # frames that belong in an F8 figure, not the task gallery).
+        exclude = row.get("exclude") or []
         files = sorted(
-            [f for f in os.listdir(row_dir) if f.lower().endswith(exts)],
+            [
+                f
+                for f in os.listdir(row_dir)
+                if f.lower().endswith(exts)
+                and not any(fnmatch.fnmatch(f, pat) for pat in exclude)
+            ],
             key=lambda f: sort_key(f, init_aliases),
         )
         if not files:

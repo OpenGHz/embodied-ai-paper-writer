@@ -58,3 +58,4 @@ rows:
   - group: real
     task: cabinet
     dir: raw_data/real/images/cabinet
+    exclude: ["*_fail.png"]        # drop failure frames (those belong in an F8 figure)
