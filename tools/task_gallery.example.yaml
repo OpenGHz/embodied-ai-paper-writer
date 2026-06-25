@@ -1,0 +1,60 @@
+# task_gallery.example.yaml — config for tools/task_gallery_figure.py
+#
+# A per-task gallery (F4 task-definitions / F5 rollouts style): each row is one
+# task showing its init image + per-operation screenshots. Copy to
+# task_gallery.yaml next to your paper, edit, then:
+#
+#   python3 tools/task_gallery_figure.py --config task_gallery.yaml --workspace <paper-dir>
+#
+# All paths (rows[].dir, output.dir) are relative to --workspace (default: CWD).
+
+output:
+  name: fig5_task_gallery          # output basename
+  dir: figures                     # output directory (under the workspace)
+  formats: [pdf, png]              # which formats to write (pdf for the paper, png for self-check)
+  dpi: 300
+
+style:
+  font_size: 10                    # base font size; row label = +1 (bold), sub-caption = -1
+  font_family: sans-serif          # sans-serif (paper-figure default) or serif
+  # Preferred fonts in order; keep an always-present fallback last (DejaVu Sans/Serif
+  # ship with matplotlib) so it still renders sans-serif if Arial/Helvetica aren't installed.
+  font_names: ["Arial", "Helvetica", "DejaVu Sans"]
+  label_color: "#000000"           # per-row task-label color
+  label_format: "{task} ({group})" # how the row label reads; {task} and {group} are filled per row
+
+layout:
+  panel_h: 1.55                    # inches per panel (image area)
+  caption_h: 0.18                  # inches reserved for the sub-caption text
+  label_w: 1.15                    # inches for the per-row task label column
+  panel_w: 1.85                    # inches per image column
+  hspace: 0.05                     # vertical gap between grid rows
+  wspace: 0.08                     # horizontal gap between panels
+  square_crop: true                # center-crop each image to a square (uniform aspect ratio)
+
+captions:                          # how a filename becomes a panel sub-caption
+  init_aliases: [init, 0_init]     # stems treated as the "init" panel (also any "*_init")
+  strip_numeric_prefix: true       # "0_unlock" -> "unlock"; "_"/"-" become spaces
+  rename:                          # explicit label fixes (matched case-insensitively)
+    "open the door": "pull door"
+
+image_extensions: [.png, .jpg, .jpeg]
+
+# One entry per task row, in display order. Within a row, panels are ordered
+# init-first, then by the numeric filename prefix (e.g. 1_*, 2_*, ...).
+rows:
+  - group: sim                     # {group} in label_format; also visually groups rows
+    task: safe                     # {task} in label_format
+    dir: raw_data/sim/images/safe  # folder of screenshots for this task
+  - group: sim
+    task: lamp
+    dir: raw_data/sim/images/lamp
+  - group: sim
+    task: door
+    dir: raw_data/sim/images/door
+  - group: real
+    task: bottle
+    dir: raw_data/real/images/bottle
+  - group: real
+    task: cabinet
+    dir: raw_data/real/images/cabinet

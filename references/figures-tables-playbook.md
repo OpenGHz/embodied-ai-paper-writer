@@ -90,6 +90,8 @@ Task Definitions / Experimental Tasks. We illustrate {N} tasks: {task A}, {task 
 
 **Critical rule**: every task name in the figure must appear identically across figure, table, and prose. Mobile ALOHA defines 7 tasks ("Wipe Wine", "Cook Shrimp", "Rinse Pan", "Push Chairs", "Call Elevator", "Use Cabinet", "High Five") in Fig. 3, and every later table uses these exact names.
 
+**To build a task-gallery figure** (per-task init + operation screenshots in grouped rows, e.g. simulator vs. real-robot), use the config-driven generator `tools/task_gallery_figure.py` (YAML config: `tools/task_gallery.example.yaml`) — it lays out one row per task, init-first then operations, with sub-captions.
+
 ---
 
 ## Step 6 — Write qualitative rollout caption (F5) as a sequence story
