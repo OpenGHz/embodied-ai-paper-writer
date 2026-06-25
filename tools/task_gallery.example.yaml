@@ -31,6 +31,11 @@ layout:
   hspace: 0.05                     # vertical gap between grid rows
   wspace: 0.08                     # horizontal gap between panels
   square_crop: true                # center-crop each image to a square (uniform aspect ratio)
+  # Fractional trim per side (0..1), applied AFTER square_crop so panels stay a
+  # uniform aspect. {top: 0.2} drops the top 20% of every panel; lower panel_h
+  # alongside it so the row shrinks instead of leaving whitespace. A row can
+  # override this with its own `crop:` (see rows[] below).
+  crop: {top: 0.0, bottom: 0.0, left: 0.0, right: 0.0}
 
 captions:                          # how a filename becomes a panel sub-caption
   init_aliases: [init, 0_init]     # stems treated as the "init" panel (also any "*_init")

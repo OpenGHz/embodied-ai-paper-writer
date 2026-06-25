@@ -65,6 +65,10 @@ DEFAULTS: dict[str, Any] = {
         "hspace": 0.05,
         "wspace": 0.08,
         "square_crop": True,
+        # Fractional trim per side (0..1), applied AFTER square_crop so panels
+        # stay a uniform aspect. e.g. {"top": 0.2} drops the top 20% of every
+        # panel. Per-row `crop:` overrides this globally-set default.
+        "crop": {"top": 0.0, "bottom": 0.0, "left": 0.0, "right": 0.0},
     },
     "captions": {
         "init_aliases": ["init", "0_init"],
@@ -183,6 +187,21 @@ def _center_square_crop(img):
     return img.crop((left, top, left + side, top + side))
 
 
+def _crop_margins(img, m: dict):
+    """Trim fractional margins (0..1 per side) from an image."""
+    w, h = img.size
+    left = int(round(w * float(m.get("left", 0) or 0)))
+    right = int(round(w * float(m.get("right", 0) or 0)))
+    top = int(round(h * float(m.get("top", 0) or 0)))
+    bottom = int(round(h * float(m.get("bottom", 0) or 0)))
+    box = (left, top, max(left + 1, w - right), max(top + 1, h - bottom))
+    return img.crop(box)
+
+
+def _has_crop(m: dict) -> bool:
+    return any(float(m.get(k, 0) or 0) > 0 for k in ("top", "bottom", "left", "right"))
+
+
 # --------------------------------------------------------------------------- #
 # Figure
 # --------------------------------------------------------------------------- #
@@ -241,6 +260,9 @@ def build_figure(rows: list[dict], cfg: dict):
                 img = Image.open(r["panels"][col_idx]["path"])
                 if lay["square_crop"]:
                     img = _center_square_crop(img)
+                crop = {**(lay.get("crop") or {}), **(r.get("crop") or {})}
+                if _has_crop(crop):
+                    img = _crop_margins(img, crop)
                 ax.imshow(img)
                 ax.set_aspect("equal")
         else:  # caption strip
