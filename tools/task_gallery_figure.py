@@ -28,6 +28,12 @@ import sys
 from pathlib import Path
 from typing import Any
 
+# This is a headless figure generator (saves files, opens no window), so pin a
+# non-interactive backend before matplotlib is ever imported. Avoids the noisy
+# "QFileSystemWatcher::removePaths: list is empty" warnings a Qt backend prints
+# on cleanup. `setdefault` lets a caller still override via MPLBACKEND.
+os.environ.setdefault("MPLBACKEND", "Agg")
+
 try:
     import yaml
 except ModuleNotFoundError:
@@ -40,7 +46,7 @@ except ModuleNotFoundError:
 # --------------------------------------------------------------------------- #
 
 DEFAULTS: dict[str, Any] = {
-    "output": {"name": "task_gallery", "dir": "figures", "formats": ["pdf", "png"], "dpi": 300},
+    "output": {"name": "task_gallery", "dir": "figures", "formats": ["pdf"], "dpi": 300},
     "style": {
         "font_size": 10,
         "font_family": "sans-serif",
