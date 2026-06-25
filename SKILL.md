@@ -52,6 +52,8 @@ Match the user's request to a row, then read ONLY the listed reference file(s). 
 | Write / narrate ablations | `references/experiments-results-playbook.md` | `references/language-phrasebank.md` |
 | Caption a figure or table | `references/figures-tables-playbook.md` | `references/experiments-results-playbook.md` (for statistical disclosure) |
 | Pick a figure type for a role | `references/figures-tables-playbook.md` (Step 1) | — |
+| Draw / build the teaser (raster, AI-generated) | `references/teaser-figure-playbook.md` | `references/image-render-invocation.md` (to call the renderer) |
+| Build / export an architecture, pipeline, or conceptual diagram (vector, draw.io) | `references/drawio-figure-playbook.md` | `references/figures-tables-playbook.md` (Step 3, F2 caption) |
 | Write the Conclusion | `references/closing-appendix-playbook.md` (Part 1) | `references/flow-transitions.md` (for contribution restatement) |
 | Write Limitations / Future Work | `references/closing-appendix-playbook.md` (Parts 2–3) | — |
 | Structure the Appendix | `references/closing-appendix-playbook.md` (Part 5) | — |
@@ -659,6 +661,7 @@ Step 5: Prioritize fixes
 | `references/teaser-figure-playbook.md` | F1 teaser / graphical abstract deep-dive: naming, 4 visual variants, image composition + conference visual-style standards, caption-as-promise, Intro reference, drawing-prompt artifact + approval gate, draw→review→refine loop, anti-patterns | 10 KB |
 | `references/teaser-prompt.template.yaml` | Copy-to-`teaser-prompt.yaml` template: the single reference consolidating variant/layout/caption/style/generation-prompt/output-path/Intro-pointer/review-bar for the teaser | 2 KB |
 | `references/image-render-invocation.md` | Renderer plumbing, self-contained: default REST adapter (`tools/images_api_render.py` → `images/generations`) with the Codex `codex-image2` MCP bridge as alternative; endpoint check → render → finalize/verify via `tools/figure_render_helper.py`, output structure, rules | 6 KB |
+| `references/drawio-figure-playbook.md` | Vector diagrams (F2 architecture / pipeline / conceptual) in draw.io: PDF export (`--crop --border --page-index`), MathJax (`math=1` + `\(\)`), typography tiers, color-by-role palette, desktop-app pitfalls, design principles, 2px arrow conventions | 7 KB |
 | `references/language-phrasebank.md` | Section A–K rhetorical phrasebook: openers, contributions, pivots, hedging, connectors, anti-patterns | 24 KB |
 | `references/flow-transitions.md` | 6-move paper arc, section openers, contribution-restatement spiral, pivot family, inter-paragraph connectors | 22 KB |
 | `references/closing-appendix-playbook.md` | Conclusion 3-move recap, Limitations admit-and-propose, Appendix TOC, hyperparameter conventions, Author Contributions | 25 KB |

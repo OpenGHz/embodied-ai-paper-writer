@@ -64,7 +64,7 @@ Design rules that hold across variants:
 
 ### Visual style standards (top-tier-conference grade)
 
-These apply most to the **pipeline+punchline** and any schematic/diagram regions; the photographic montage / single-shot variants inherit the palette, label, and grayscale rules but not the arrow rules.
+These apply most to the **pipeline+punchline** and any schematic/diagram regions; the photographic montage / single-shot variants inherit the palette, label, and grayscale rules but not the arrow rules. To build a schematic region as a clean vector diagram (rather than generating it raster), use draw.io — see `drawio-figure-playbook.md`.
 
 - **Restrained palette** — 3–5 coordinated colors, not a rainbow. Keep a stable mapping between a meaning and its color across the whole figure (and the rest of the paper's figures).
 - **Survives grayscale + scaling** — the figure must stay readable when printed in black-and-white and when shrunk to column width / thumbnail. Don't let color be the *only* carrier of a distinction.

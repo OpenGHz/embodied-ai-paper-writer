@@ -63,6 +63,8 @@ The architecture figure is referenced 5–15 times across the paper. Its caption
 
 **Component count rule**: 3–4 components is the sweet spot. If you have 2, the diagram looks bare. If 5+, reviewers can't hold the diagram in working memory.
 
+**To actually build the architecture diagram** (vector, in draw.io — export, MathJax labels, color-by-role, arrow conventions), see `drawio-figure-playbook.md`.
+
 ---
 
 ## Step 4 — Write hardware photo caption (F3) as a reproducibility contract
