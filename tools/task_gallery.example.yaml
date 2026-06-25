@@ -9,7 +9,7 @@
 # All paths (rows[].dir, output.dir) are relative to --workspace (default: CWD).
 
 output:
-  name: fig5_task_gallery          # output basename
+  name: task_gallery          # output basename
   dir: figures                     # output directory (under the workspace)
   formats: [pdf]                   # which formats to write (add png for a quick self-check)
   dpi: 300
