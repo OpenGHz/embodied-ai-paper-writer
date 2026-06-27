@@ -640,6 +640,12 @@ Step 5: Prioritize fixes
     - **Anti-pattern**: "a latched microwave, a locked cabinet, a sprung door."
     - **Fix**: "such as a latched microwave," reused at later mentions.
 
+36. **No defensive coda after the contributions; state contributions positively.**
+    - Do not append a self-justifying paragraph after the contributions list that declares what is *not* a contribution or pre-defends the framing. Real papers end the Introduction on the contributions list (or a one-line roadmap), not on a disclaimer.
+    - **Anti-pattern**: after the `\item` list, "The policy is deliberately *not* a contribution: we reuse an existing policy… The contribution is the framework…, on the axis of efficiency, not success rate, which serves as a guardrail…" — defensive over-explaining a reviewer never asked for.
+    - **Fix**: delete it. State each contribution positively *in the list itself*; let positioning (e.g.\ efficiency-not-success) live in the Abstract and the relevant contribution bullet. If a fact like "the policy is reused" matters, state it once, matter-of-factly, at the Method instantiation, not as a disclaimer.
+    - **Detection**: if the sentence after `\end{itemize}` contains "not a contribution", "we do not claim", or restates the contributions with a "not X" hedge, cut it.
+
 ---
 
 ## When to ask vs. when to default
