@@ -652,6 +652,12 @@ Step 5: Prioritize fixes
     - **Fix**: keep the mechanism in the narrative; let the bullet carry only its own headline (here, the efficiency numbers). Cut the restating clause.
     - **Detection**: for each contribution bullet, check whether its explanatory clause paraphrases a sentence already in the Intro prose or the Abstract; if so, delete the clause from the bullet. Generalize: this is the contributions-vs-narrative case of the broader rule that no claim should appear twice in nearby text (sibling to rule 29, one-topic-per-subsection).
 
+38. **Report results statistically; don't recite the table row by row.**
+    - Results prose *interprets* the table with ranges, factors, and aggregates; it does not restate each task's number — those live in the table, and re-listing them per task is the most common form of results-section bloat.
+    - **Anti-pattern**: "cuts operations by 30.2\% on microwave and 16.2\% on door … and 26.8\% on bottle and 16.2\% on cabinet"; "captures 88\% on microwave, 69\% on door, 81\% on bottle, 77\% on cabinet."
+    - **Fix**: "cuts operations by 16--30\% across the four tasks"; "recovers 69--88\% of the oracle reduction." Reserve specific numbers for the single headline figure and for analysis **not** in the table (a distribution shift, one illustrative example, a derived factor / multiple).
+    - **Detection**: if a results sentence lists ≥3 task-keyed numbers that also appear in a table column, collapse them to a range or a factor; keep at most one concrete example per mechanism.
+
 ---
 
 ## When to ask vs. when to default
