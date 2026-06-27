@@ -612,6 +612,34 @@ Step 5: Prioritize fixes
     - **Detection**: for each `\subsection{...}`, list the sentence-level claim of every sentence. Group by topic-noun. If two distinct topic-nouns appear, the subsection mixes topics — split or relocate.
     - This rule is the **section-level analog** of rule 5 (one pivot per gap). Rule 5 keeps a single paragraph's argument structurally clean; rule 29 keeps a single subsection's topical scope clean.
 
+30. **Related Work buckets are `\subsection`s, not run-in `\paragraph`s**.
+    - Each research class gets a `\subsection{...}` at the same heading level as the Method's subsections (IEEEtran renders these `A.`, `B.`, `C.` …); do not use `\paragraph{...}` run-in bold headers for Related Work families.
+    - **Anti-pattern**: a Related Work made of four `\paragraph{Cross-episode memory…}` run-ins while the Method uses `\subsection` — inconsistent and harder to scan.
+    - **Detection**: grep Related Work for `\paragraph{`; if the families are `\paragraph`, promote them to `\subsection`. The bucket-header noun-phrase audit still applies.
+
+31. **Subject is the method, not the robot** (anti-anthropomorphism).
+    - Claims about prior work, the gap, or failure modes take the method / system / memory as the grammatical subject, not "robots" generically. A robot may anchor a *motivating scenario*, but not statements about what approaches do.
+    - **Anti-pattern**: "Most robots nonetheless do exactly that."
+    - **Fix**: "Existing cross-episode memories nonetheless preserve that overhead."
+
+32. **Do not coin a named principle you use once.**
+    - If a capitalized "Principle / Property" earns a boxed definition and its own (sub)section but is referenced almost nowhere else, de-coin it: explain the idea inline in Intro / Related and keep only the descriptive term for the artifact it produces.
+    - **Detection**: for each coined, capitalized concept, count uses outside its own definition; if ≤2, drop the coinage and fold the idea into running prose.
+
+33. **Position differently-motivated work by objective, not artifact superiority.**
+    - When prior work pursues a different goal than yours, frame the delta as *objective + organization*, not "our representation beats theirs" — claiming superiority on an axis the other work never optimized is a strawman reviewers will rebut.
+    - **Anti-pattern**: "we store a procedure (which shortens) vs.\ they store a trajectory (which cannot)," when shortening was never their goal.
+    - **Fix**: "they target success and organize memory around states; we are object-centric and target efficiency."
+
+34. **Lock the general term in framing; use the instantiation term only at the disclosure site.**
+    - Abstract / Intro / Method-general-form use the general module or concept name (e.g.\ `procedure-conditioned policy`, `identifiable features`); the specific realization (`language-conditioned policy`, `appearance`, a model identifier) appears only where the instantiation is described.
+    - The noun analog of rules 20–21, applied to the **general-vs-instantiation** axis: do not let a basic implementation choice (e.g.\ a `frozen` policy) read as a core property in the framing.
+
+35. **One running example, not an example list.**
+    - Motivate with a single concrete instance threaded through the paper; do not open with a comma list of three illustrations.
+    - **Anti-pattern**: "a latched microwave, a locked cabinet, a sprung door."
+    - **Fix**: "such as a latched microwave," reused at later mentions.
+
 ---
 
 ## When to ask vs. when to default
