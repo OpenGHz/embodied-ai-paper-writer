@@ -646,6 +646,12 @@ Step 5: Prioritize fixes
     - **Fix**: delete it. State each contribution positively *in the list itself*; let positioning (e.g.\ efficiency-not-success) live in the Abstract and the relevant contribution bullet. If a fact like "the policy is reused" matters, state it once, matter-of-factly, at the Method instantiation, not as a disclaimer.
     - **Detection**: if the sentence after `\end{itemize}` contains "not a contribution", "we do not claim", or restates the contributions with a "not X" hedge, cut it.
 
+37. **One home per claim — don't restate the narrative inside the contributions list.**
+    - A point already made in the Intro's narrative paragraphs must not be repeated in a contribution `\item` (or vice versa). Each claim lives in exactly one place. Contribution bullets are crisp statements of *what is new + the headline evidence*, not a re-explanation of a mechanism the prose already covered.
+    - **Anti-pattern**: ¶3 says "Because the procedure enters only as a soft bias, a wrong recollection falls back to exploration rather than to failure," and then the *Empirical efficiency* bullet appends "because the procedure is a soft bias on a feedback-driven policy, a wrong memory costs only operations, not success" — the same mechanism stated twice.
+    - **Fix**: keep the mechanism in the narrative; let the bullet carry only its own headline (here, the efficiency numbers). Cut the restating clause.
+    - **Detection**: for each contribution bullet, check whether its explanatory clause paraphrases a sentence already in the Intro prose or the Abstract; if so, delete the clause from the bullet. Generalize: this is the contributions-vs-narrative case of the broader rule that no claim should appear twice in nearby text (sibling to rule 29, one-topic-per-subsection).
+
 ---
 
 ## When to ask vs. when to default
