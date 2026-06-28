@@ -406,6 +406,7 @@ Step 5: Prioritize fixes
 8. **Every limitation pairs with a future-work mitigation**.
    - Naked limitations read as defeatist. Each gets `Future work could ...` in the same paragraph.
    - **Anti-pattern**: a standalone `\textbf{Future work.}` paragraph at the end of the section. The default CoRL/RSS/ICRA pattern (D1 in `closing-appendix-playbook.md` Step 10) folds each direction into its source limitation paragraph. Reserve a standalone Future Work section for Science Robotics or heavy-page-budget submissions with 3+ unrelated directions that don't map onto existing limitation paragraphs.
+   - **Name a mitigation mechanism as one example, not the sole path**: when the future-work clause cites a concrete mechanism, mark it as illustrative (`for example through a long-term memory`), not the mandated solution, unless it genuinely is the only option. Anti-pattern: "persistence requires tracking applied operations `through` a longer-horizon memory" (reads as the one fix). Fix: "letting the robot determine the state on its own, `for example through` a long-term memory of past interactions."
 
 9. **Hedge first-claims with scope**.
    - Never write `We are the first to do X.` — write `To the best of our knowledge, we are the first to do X under constraint Y.`
@@ -645,6 +646,9 @@ Step 5: Prioritize fixes
     - **Anti-pattern**: after the `\item` list, "The policy is deliberately *not* a contribution: we reuse an existing policy… The contribution is the framework…, on the axis of efficiency, not success rate, which serves as a guardrail…" — defensive over-explaining a reviewer never asked for.
     - **Fix**: delete it. State each contribution positively *in the list itself*, and convey positioning (e.g.\ efficiency-not-success) **implicitly** — lead with it and let the results carry it — never as an explicit "we position X, not Y, as the contribution" declaration. This applies to the **Abstract's closing too**: replace "We therefore position efficiency, not success rate, as the contribution…" with a natural statement of the result ("the benefit is purely one of efficiency: success never regresses, and on the real robot even improves"). If a fact like "the policy is reused" matters, state it once, matter-of-factly, at the Method instantiation, not as a disclaimer.
     - **Detection**: if the sentence after `\end{itemize}`, or the Abstract's last sentence, contains "not a contribution", "we position … not …", "we do not claim", or restates the contributions with a "not X" hedge, cut or rephrase it to a positive statement.
+    - **The same positive-framing discipline applies mid-body, not only at the contributions coda**:
+      - **Scope is a fork, not an apologetic assumption.** Present a studied regime as one branch of a neutral fork and name the branch you take, not as a precondition the method leans on. Anti-pattern: "This reuse assumes the instance returns to the same hidden state, the reset setting we study." Fix: "The hidden state may reset between encounters or persist; … our experiments use only the reset setting." Valid only when the other branch is a legitimate alternative (not a failure mode) and the contribution applies to both; if X is a fragile precondition, "we assume X" is the honest phrasing, not a hedge to launder.
+      - **Name your method as the subject of its value claims.** Don't abstract the method's name out of a value statement to dodge a perceived overclaim; name it and let an adjacent clause carry the scope. Anti-pattern (timid circumlocution): "Both settings draw the same value from a first encounter's discovery…" Fix: "IOM provides the same value in both settings, so our experiments use only the reset setting" — the scope limit rides the next clause, not an abstracted-away subject.
 
 37. **One home per claim — don't restate the narrative inside the contributions list.**
     - A point already made in the Intro's narrative paragraphs must not be repeated in a contribution `\item` (or vice versa). Each claim lives in exactly one place. Contribution bullets are crisp statements of *what is new + the headline evidence*, not a re-explanation of a mechanism the prose already covered.
@@ -657,6 +661,18 @@ Step 5: Prioritize fixes
     - **Anti-pattern**: "cuts operations by 30.2\% on microwave and 16.2\% on door … and 26.8\% on bottle and 16.2\% on cabinet"; "captures 88\% on microwave, 69\% on door, 81\% on bottle, 77\% on cabinet."
     - **Fix**: "cuts operations by 16--30\% across the four tasks"; "recovers 69--88\% of the oracle reduction." Reserve specific numbers for the single headline figure and for analysis **not** in the table (a distribution shift, one illustrative example, a derived factor / multiple).
     - **Detection**: if a results sentence lists ≥3 task-keyed numbers that also appear in a table column, collapse them to a range or a factor; keep at most one concrete example per mechanism.
+
+39. **Cut what a connective or an earlier passage already supplies.**
+    - Three local-redundancy forms of "don't state what the reader already holds":
+      - **Inferential bridge** — `A, so B, therefore C` collapses to `A, so C` when `B` is just the inference the connective already carries. Anti-pattern: "…the same value, so either one alone demonstrates the framework. Our experiments therefore use only reset." Fix: "IOM provides the same value in both settings, so our experiments use only the reset setting."
+      - **Label glossed in place** — a one-off abstract label immediately renamed by a concrete appositive and never reused is redundant with its gloss; keep the description, drop the label. Anti-pattern: "the same value from `cross-encounter memory`, a first encounter's discovery sparing later exploration." Fix: "…from a first encounter's discovery sparing later exploration." (A *contribution* noun is the opposite case — it earns name+gloss in every section, rule 24.)
+      - **Re-gloss of an established concept** — a concept defined earlier (Abstract / Intro / Problem Setup) is referred to plainly later, not re-explained. Anti-pattern: re-appending "a first encounter's discovery sparing later exploration" in a later paragraph when Problem Setup already established the amortization.
+    - Generalizes rule 20 (modifier redundancy) and rule 37 (claim redundancy) to inferential and glossing redundancy; the inverse-positive case is rule 24 (contribution nouns DO get name+gloss every section).
+
+40. **State a contrast as a plain antithesis, not a nominalized metaphor.**
+    - Don't compress a contrast into a clever nominalization the reader must decode; write both sides directly (a `whereas` / `requires nothing further … additionally requires` antithesis).
+    - **Anti-pattern**: "reset isolates this value, whereas persistence …" (the reader must reconstruct "isolates from what?").
+    - **Fix**: "reset requires nothing further, whereas persistence additionally requires …".
 
 ---
 
