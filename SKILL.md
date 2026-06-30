@@ -675,6 +675,13 @@ Step 5: Prioritize fixes
     - **Anti-pattern**: "reset isolates this value, whereas persistence …" (the reader must reconstruct "isolates from what?").
     - **Fix**: "reset requires nothing further, whereas persistence additionally requires …".
 
+41. **Open a Related-Work bucket on the work, not on "the Nth line of work".**
+    - The `\subsection` header already labels the bucket (rule 15); the first sentence must not re-announce it with scaffolding like `The closest line …`, `A second line …`, `Another line of work …`, `A third direction …`. Name the research area as the grammatical subject and dive into the work.
+    - **Anti-pattern**: `The closest line gives a policy a memory of past successes…` / `A second line resolves an object's hidden state…` — `line` is vague (the reader decodes "line of work" before learning the topic) and the ordinal re-narrates the header.
+    - **Fix**: `Closest to our setting, a policy is given a memory of past successes…` (keeps the closest-work signal, drops `line`); `A separate body of work resolves an object's hidden state…`. A genuine ordering signal (which bucket is nearest your method) is worth keeping — carry it on the work, not on the word `line`.
+    - **Consistency tell**: if some buckets open this way and others already dive in (`Retrieval has also been used for…`, `The store-abstract-retrieve loop is well established…`), the scaffolded ones are the defect — align them to the divers, not the reverse.
+    - The **opener** sibling of rule 15 (which governs the bucket **header**): rule 15 keeps the header a distinguishing noun phrase; rule 41 keeps the first sentence from wasting itself re-announcing that header.
+
 ---
 
 ## When to ask vs. when to default
