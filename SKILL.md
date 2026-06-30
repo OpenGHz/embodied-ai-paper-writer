@@ -408,8 +408,9 @@ Step 5: Prioritize fixes
    - **Anti-pattern**: a standalone `\textbf{Future work.}` paragraph at the end of the section. The default CoRL/RSS/ICRA pattern (D1 in `closing-appendix-playbook.md` Step 10) folds each direction into its source limitation paragraph. Reserve a standalone Future Work section for Science Robotics or heavy-page-budget submissions with 3+ unrelated directions that don't map onto existing limitation paragraphs.
    - **Name a mitigation mechanism as one example, not the sole path**: when the future-work clause cites a concrete mechanism, mark it as illustrative (`for example through a long-term memory`), not the mandated solution, unless it genuinely is the only option. Anti-pattern: "persistence requires tracking applied operations `through` a longer-horizon memory" (reads as the one fix). Fix: "letting the robot determine the state on its own, `for example through` a long-term memory of past interactions."
 
-9. **Hedge first-claims with scope**.
+9. **Hedge first-claims and negative-existence claims with scope**.
    - Never write `We are the first to do X.` — write `To the best of our knowledge, we are the first to do X under constraint Y.`
+   - The same hedge covers any **negative-existence claim about the literature** — `no benchmark isolates X`, `no prior method does Y`, `no dataset captures Z` — which is a disguised first-claim (it asserts you have surveyed the whole field). Prefix it with `To the best of our knowledge`. Anti-pattern: "no existing benchmark isolates whether models defer to feedback." Fix: "To the best of our knowledge, no existing benchmark isolates whether models defer to feedback." Detection: grep for `no existing`, `no prior`, `no benchmark`, `no method`, `none of`, `the first`, `has not been`; each must sit behind the hedge unless it cites the survey that establishes it.
 
 10. **Cite the playbook step when the user pushes back**.
     - If the user argues against an edit, cite the specific Step from the relevant reference (e.g., "abstract-intro-playbook.md Step 5 — Move 5 mandates delta-form numbers"). Don't argue from authority — argue from observed corpus patterns.
