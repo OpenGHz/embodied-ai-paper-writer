@@ -682,6 +682,11 @@ Step 5: Prioritize fixes
     - **Consistency tell**: if some buckets open this way and others already dive in (`Retrieval has also been used for…`, `The store-abstract-retrieve loop is well established…`), the scaffolded ones are the defect — align them to the divers, not the reverse.
     - The **opener** sibling of rule 15 (which governs the bucket **header**): rule 15 keeps the header a distinguishing noun phrase; rule 41 keeps the first sentence from wasting itself re-announcing that header.
 
+42. **A float's page placement is set by its declaration point, not its `\ref` — to fix placement, move only the environment, never the description.**
+    - A LaTeX table/figure floats forward from where `\begin{table}`/`\begin{figure}` sits in the source but never before it. When one lands on the wrong page (classically, a setup table deferring onto the references page of a full paper), relocate the *declaration* earlier, to any point after its dependencies are defined (a $\mathcal{K}^\circ$ table must follow the section defining $\mathcal{K}^\circ$). The `\ref` and caption are independent and stay in their semantic home — moving the environment does not require moving them.
+    - **Discipline**: when the task is a placement fix, edit only the float environment. Do not move, rewrite, add, or delete the `\ref` sentence or the caption to chase page position; that conflates layout with content and corrupts the prose (sibling to rule 23: a placement request is not licence to edit descriptions).
+    - **Detection**: if a change aimed at a float's page position touched any `\ref` sentence or caption, revert those prose edits and keep only the moved environment. This is a table/figure placement convention, distinct from compile-error debugging (out of scope).
+
 ---
 
 ## When to ask vs. when to default
