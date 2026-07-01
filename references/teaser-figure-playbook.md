@@ -51,26 +51,103 @@ The teaser's composition follows one of four recurring layouts. Pick by what car
 
 ---
 
-## Step 2 — Compose the image
+## Step 2 — Compose the image (visual-style standards)
 
-Design rules that hold across variants:
+### Core principles
 
+- **Complementarity with the architecture figure.** The teaser builds intuition; the architecture figure (F2) shows technical completeness. Avoid content overlap — the teaser is not a shrunken architecture diagram. See "Teaser vs. architecture" below.
 - **One reading path.** The eye should land on the hero behavior first, then optionally trace the pipeline/montage. Avoid a layout where the reader doesn't know where to look.
 - **Show the embodiment.** Embodiment is part of the experimental claim — the robot (Franka, Unitree G1, ANYmal-D, Stretch RE-1…) should be visible and recognizable, not abstracted away.
 - **Show the deployment context.** Real-world / in-the-wild / indoor-and-outdoor framing signals that every claim is conditioned on transfer. Make the environment legible.
 - **Multi-panel → label the panels.** If the teaser splits into regions, use a single panel-notation system (`Left:/Right:`, `(a)/(b)`) and decode it in the caption. Pick one notation system for the whole paper.
-- **Color is a naming device.** If the teaser color-codes method vs. baseline or task categories, that mapping must be disclosed in the caption (see Step 3, ingredient 7).
 - **Numbered steps for pipelines.** When the teaser walks through a sequential procedure, number the steps in the image and mirror them in the caption (e.g., RoboCook's 9-step dumpling sequence).
 
-### Visual style standards (top-tier-conference grade)
+### Visual complexity rule: minimal text, at most 1 formula
 
-These apply most to the **pipeline+punchline** and any schematic/diagram regions; the photographic montage / single-shot variants inherit the palette, label, and grayscale rules but not the arrow rules. To build a schematic region as a clean vector diagram (rather than generating it raster), use draw.io — see `drawio-figure-playbook.md`.
+**❌ Do not include:**
+- Large block titles or dense paragraphs
+- Dense formula derivations or multiple equations
+- Technical detail stacks (module internals, data-flow minutiae)
+- Architecture-diagram module boxes and arrows (those belong in the F2 architecture figure, not the teaser)
 
-- **Restrained palette** — 3–5 coordinated colors, not a rainbow. Keep a stable mapping between a meaning and its color across the whole figure (and the rest of the paper's figures).
-- **Survives grayscale + scaling** — the figure must stay readable when printed in black-and-white and when shrunk to column width / thumbnail. Don't let color be the *only* carrier of a distinction.
-- **Clean background, clean type** — white/near-white background, sans-serif labels at a readable size with a clear size hierarchy (main modules larger, secondary smaller). No tiny unreadable text.
-- **Arrows (for pipeline/schematic regions) — the most error-prone element**: thick strokes, large unmistakable arrowheads, dark color; label important arrows with what flows through them; route to avoid crossings; and **point in the correct direction**.
-- **Tasteful, not decorative** — subtle same-family gradients and restrained rounded corners are fine. Avoid rainbow gradients, heavy drop shadows, 3D perspective, glow, clip-art icons, and slide-deck styling. Aim for *paper-ready, not slide-ready*.
+**✅ Keep only:**
+- **A single core formula** (only when that formula *is* the method's unique identifier — e.g. a one-line update rule that captures the whole contribution). If you're unsure whether it's "the core formula," omit it.
+- Visual, vivid concept illustration
+- Linear narrative structure (problem → method → effect)
+- Concrete visual example scenarios
+
+### Results in the teaser: show comparison visually, not numerically
+
+**❌ Do not write numeric results by default** — no `Accuracy: 92.3%`, `Operations: 150 → 90`, or table-style performance summaries. The teaser is not a mini-results section.
+
+**✅ Show advantages through visual contrast:**
+- Baseline vs. Ours side-by-side screenshots
+- Operation-count reduction shown via fewer arrows or a shorter pipeline
+- Success/failure states in direct visual comparison
+- Before/after juxtaposition
+
+### Image style: 3D photoreal rendering
+
+For the **pipeline+punchline** and **single-shot** variants, use high-quality 3D-rendered robots and objects with realistic lighting/textures. Place abstract concepts into concrete interaction scenes.
+
+- **3D photoreal rendering**: the robot, objects, and environment use high-quality 3D models with rich detail, realistic surface materials, and lighting/shadows.
+- **Scenario-based presentation**: situate the abstract concept in a specific interaction scene (e.g., a robot manipulating a cabinet, not a floating abstract box labeled "cabinet").
+- **Detail-rich**: preserve object realism, textures, and lighting cues — avoid simplistic clip-art or stick-figure schematics.
+
+For schematic/pipeline regions that must stay diagrammatic (e.g. a flow overlay or a conceptual decomposition), the draw.io vector path (`drawio-figure-playbook.md`) is the clean alternative — but keep schematics minimal and favor the photoreal scene for the main narrative.
+
+### 5-color semantic system (status + structure)
+
+Use a **multi-color status tagging system** with fixed role-to-color mapping (disclosed in the caption per Step 3, ingredient 7):
+
+| Color | Meaning | Examples |
+|---|---|---|
+| 🟠 **Orange** | Failure, error operation, parts needing improvement | failed grasp, incorrect trajectory, redundant step |
+| 🔵 **Blue** | Intermediate step, processing, data flow | observation stream, in-progress module, trace |
+| 🟢 **Green** | Success, final result, optimized state | successful execution, final distilled output |
+| ⬜ **Grey** | Title bars, background regions, grouping containers | phase labels, section dividers |
+| 🟡 **Yellow** | Highlight key element, storage/memory module | the distilled knowledge, the memory lookup |
+
+Principles:
+- **Color maps to role category** (input / processing / success / failure / storage), not a random hue per panel, so the reader can infer meaning from color.
+- **Survives grayscale + scaling** — don't let color be the *only* carrier of a distinction; reinforce with shape, position, or label.
+- **Avoid clashes**: backgrounds/grouping always use neutral grey; reserve saturated colors for functional states.
+
+### Arrows (for pipeline/schematic regions) — the most error-prone element
+
+- **Thick strokes, large arrowheads, dark color** — the default 1px thin arrow looks weak in print; use ≥2px.
+- **Label important arrows** with what flows through them (e.g., `observation`, `\(\hat{K}\)`).
+- **Route to avoid crossings** — reorganize layout to keep flow paths clear.
+- **Point in the correct direction** — arrows must respect causality (observation → policy, not policy → observation).
+
+### Tasteful, paper-ready styling
+
+- **Clean background, clean type** — white/near-white background, sans-serif labels (Arial/Helvetica) at a readable size with a clear size hierarchy (main modules larger, secondary smaller). No tiny unreadable text.
+- Subtle same-family gradients and restrained rounded corners are fine.
+- **Avoid**: rainbow gradients, heavy drop shadows, 3D perspective text, glow effects, clip-art icons, and slide-deck styling. Aim for *paper-ready, not slide-ready*.
+
+### Visual layout hierarchy
+
+Use these cues to distinguish primary vs. secondary information:
+- Color contrast (status colors vs. grey backgrounds)
+- Size difference (larger = more important)
+- Position (center = core innovation; edges = input/output; corners = supplementary notes)
+- Visual weight (bold vs. regular, filled vs. outlined)
+
+**Visual flow**: linear (left → center → right, or top → down) guides the reader's eye along the method's logic. **White space**: ensure key information isn't drowned; maintain clear visual gaps between modules; avoid information overload.
+
+### Teaser vs. architecture figure (F2)
+
+| Dimension | Teaser | Architecture (F2) |
+|---|---|---|
+| **Goal** | Build intuition, attract readers | Show technical completeness |
+| **Content** | Core concept + visual example | Module details + data flow + formulas |
+| **Style** | Photoreal rendering, vivid, concrete | Box-and-arrow diagrams, abstract, rigorous |
+| **Formulas** | At most 1 core formula | Full mathematical derivation |
+| **Results** | Optional visual comparison | Experimental data table when needed |
+| **Detail level** | High-level concept | Implementation details |
+
+**互补原则 (complementarity rule)**: the teaser and the architecture figure must *complement*, not duplicate. If your teaser draft looks like a miniature architecture diagram (many boxes, many arrows, data-flow annotations), you're leaking F2 content into F1 — pull back to the high-level concept and leave the technical breakdown for the method figure.
 
 ---
 
@@ -158,12 +235,19 @@ Generate the image from `generation_prompt`, honoring `layout`, `embodiment`, `e
 
 Strict review checklist (use when looping; also a handy one-pass sanity check):
 
+- **10-second understanding test**: can a reader grasp the core innovation in 10 seconds?
+- **Complementarity check**: does the teaser avoid duplicating the architecture figure's content (module boxes, data-flow arrows)? Is it high-level concept, not implementation detail?
 - All major components / panels present, and the **hero behavior reads first**?
 - Embodiment recognizable and deployment context legible?
 - Labels readable (and in the right language), with a clear size hierarchy?
-- For pipeline/schematic regions: arrows thick, dark, labeled, non-crossing, and pointing the **right** way?
-- Palette restrained; survives grayscale and column-width / thumbnail scaling?
-- Looks **paper-ready, not slide-ready** — no glow / rainbow / 3D / clip-art decoration?
+- **At most 1 formula** (and only if it's the method's unique identifier — if uncertain, omit)?
+- **No numeric results** (Accuracy: X%, Operations: Y → Z) in the teaser body — advantages shown visually via before/after or baseline-vs-ours comparison?
+- **3D photoreal rendering** (not stick-figure or clip-art) for robots/objects/scenes, or clean draw.io vector diagram for the schematic region?
+- **5-color semantic system** followed (🟠 failure, 🔵 processing, 🟢 success, ⬜ grey background, 🟡 highlight/memory)?
+- For pipeline/schematic regions: arrows thick (≥2px), dark, labeled, non-crossing, and pointing the **right** way?
+- Palette survives grayscale and column-width / thumbnail scaling?
+- Looks **paper-ready, not slide-ready** — no glow / rainbow / 3D-text / clip-art decoration?
+- **Information density**: avoids overload, preserves white space, key info not drowned?
 - Matches the `caption`'s promise and the venue's `venue_constraints`?
 
 Example refinement feedback (concrete beats vague):
@@ -234,10 +318,10 @@ Forward reference (figure number **before** the description) is the default ever
 
 1. **Identify what sells the paper** — one behavior, a generalist suite, a cross-environment capability, or a pipeline.
 2. **Pick the variant** (Step 1) that matches.
-3. **Compose** with a single reading path, visible embodiment, and legible deployment context (Step 2).
+3. **Compose** with a single reading path, visible embodiment, and legible deployment context. **Apply the visual-complexity rule**: minimal text, at most 1 core formula, no numeric results (show comparison visually instead). **Use 3D photoreal rendering** for robots/objects/scenes, or draw.io vector diagrams for schematic regions. **Follow the 5-color semantic system** (🟠 failure, 🔵 processing, 🟢 success, ⬜ grey background, 🟡 highlight/memory). **Ensure complementarity** with the architecture figure (F2) — the teaser is high-level concept, not a shrunken module diagram (Step 2).
 4. **Write the caption** as a promise: name + value prop + optional scale/novelty/video/color (Step 3).
 5. **Consolidate `teaser-prompt.yaml`** — variant, layout, caption, generation prompt, output path, figure label, Intro pointer — as the single reference; **run the renderer `check` and record `render.mode`**; then gate on user approval before drawing (Step 4).
-6. **Draw** from the YAML to `output_path` — one quick render by default; loop to review-score-refine only on request (Step 5).
+6. **Draw** from the YAML to `output_path` — one quick render by default; loop to review-score-refine only on request. Review against the checklist: 10-second understanding, complementarity with F2, no numeric results, 3D photoreal or vector, 5-color system, ≥2px arrows pointing correctly, survives grayscale, paper-ready not slide-ready (Step 5).
 7. **Drive the downstream off the YAML** — place the figure, then reference it from Intro ¶1–2 (Step 6).
 8. **Sanity check** against the anti-pattern table — especially: no bare label, no undecoded color, no over-promise.
 </content>
