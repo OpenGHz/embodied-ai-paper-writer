@@ -148,6 +148,6 @@ figures/ai_generated/
 1. Default to the REST adapter (`images_api_render.py`); fall back to the `codex-image2` bridge only when the endpoint is unconfigured but the bridge is installed.
 2. Gate before rendering: REST path → `endpoint` exits 0; bridge path → `preflight` `ok=true`. Run `verify` before claiming success.
 3. If neither renderer is available, say so honestly — do not fake an image or pass off a hand-built bitmap as a generated one.
-4. Keep figure text in **English** unless the user requested another language.
+4. Keep figure text in **English** unless the user requested another language. State this **inside the `generation_prompt` itself** (`ALL text in ENGLISH only, no other language`), not merely in the operator's `--system` preamble or config — the model renders text in the language it sees in the prompt and will otherwise drift to the surrounding conversation's language. Likewise put the "no title baked into the image" and "no sentences / no leaked prompt text or `[cite: N]` markers" guards in the prompt (teaser-figure-playbook.md Step 2, mandatory negative constraints).
 5. Report renderer errors (HTTP/network/bridge) directly instead of hiding them.
 6. The scripts are wiring; the figure's **content/style brief and acceptance bar live in `teaser-figure-playbook.md`** (Steps 2 & 5) and `teaser-prompt.yaml`.

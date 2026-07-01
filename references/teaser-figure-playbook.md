@@ -76,6 +76,16 @@ The teaser's composition follows one of four recurring layouts. Pick by what car
 - Linear narrative structure (problem → method → effect)
 - Concrete visual example scenarios
 
+### Mandatory negative constraints — write these into the `generation_prompt` verbatim
+
+Image models render *whatever text they see in the prompt*: leave a long descriptive clause, a heading, or a stray `[cite: 12]` in the brief and it gets **painted into the figure** as literal text (observed failure: an entire teaser overrun by prompt sentences and citation markers). So the `generation_prompt` must not only describe the picture — it must **explicitly forbid** the model from adding text the figure should not contain. Include all three of these instructions, near the top of the prompt, in these words or close to them:
+
+1. **Pure English only.** `ALL text in the figure must be in ENGLISH — no Chinese or any other language, anywhere.` (The paper is English; the renderer may otherwise drift to the language of the surrounding conversation. This restates `image-render-invocation.md` rule 4 *inside the prompt* so the model obeys it, not just the operator.)
+2. **No title text baked into the image.** `Do NOT render any title inside the figure — no paper title, no figure/caption heading, no section header. The title and caption live in the LaTeX, not in the raster.` (A title drawn into the teaser duplicates the `\caption{}` and cannot be edited later; it is the single most common leak.)
+3. **No prose, no prompt text, no metadata.** `Use only short label words on the objects and arrows — no sentences, no paragraph descriptions, no bullet lists, and never transcribe these instructions, notes, or citation markers (e.g. "[cite: N]") into the image.` (Keep every in-figure label to a few words; move all explanation to the caption.)
+
+**Keep the brief itself lean.** The more descriptive prose and the more embedded label strings the `generation_prompt` carries, the more the model treats as text to paint. Give the *layout and the short label words*, not full sentences the model can copy. If you must list exact label strings, keep each to ≤4 words and mark them clearly as labels — do not wrap them in explanatory clauses the model will render verbatim.
+
 ### Results in the teaser: show comparison visually, not numerically
 
 **❌ Do not write numeric results by default** — no `Accuracy: 92.3%`, `Operations: 150 → 90`, or table-style performance summaries. The teaser is not a mini-results section.
@@ -95,6 +105,26 @@ For the **pipeline+punchline** and **single-shot** variants, use high-quality 3D
 - **Detail-rich**: preserve object realism, textures, and lighting cues — avoid simplistic clip-art or stick-figure schematics.
 
 For schematic/pipeline regions that must stay diagrammatic (e.g. a flow overlay or a conceptual decomposition), the draw.io vector path (`drawio-figure-playbook.md`) is the clean alternative — but keep schematics minimal and favor the photoreal scene for the main narrative.
+
+### Represent meaningful modules with evocative icons, not plain boxes
+
+A module that carries a **specific meaning** — the perception encoder, a frozen VLM, the memory store, the policy, the camera/observation stream — must be drawn as an **icon that depicts what it does**, not as an anonymous labeled rectangle. A row of identical boxes reading `VLM` / `Memory` / `Policy` forces the reader to parse text to recover meaning the picture should have carried; it also reads as a shrunken architecture diagram (F2 leak). An evocative icon is understood pre-linguistically, survives thumbnail scale, and keeps the teaser at the *intuition* altitude.
+
+Map each meaningful module to a **conventional, instantly-legible glyph**, then keep the short text label *beside* the icon (not replacing it):
+
+| Module / concept | Evocative icon (examples) |
+|---|---|
+| Frozen / off-the-shelf model | a snowflake ❄ on the model glyph (frozen), a padlock for "not trained" |
+| VLM / LLM / neural encoder | a small chip / brain / network glyph — not a bare box |
+| Memory / store / database | a database cylinder, a labeled drawer, a card-index |
+| Camera / observation / video | a lens/aperture, a filmstrip, an eye |
+| Policy / controller | a robot-arm silhouette, a joystick, a gamepad |
+| Retrieval / key-match | a magnifier over a key, two puzzle pieces meeting |
+| Reward / score | a target, a gauge, a trophy |
+
+**Exceptions** (plain rectangles are fine): a **neutral grouping container** (a grey background region that just bundles a stage — ⬜ per the 5-color system), and a **short action/data token** on an arrow (`[open-door]`) whose job is to be read as text. The rule targets *semantic modules* masquerading as generic boxes, not every rectangle on the canvas.
+
+This composes with the photoreal rule above: the robot/objects are photoreal, and the light schematic overlay uses **meaningful icons** for its modules — neither should collapse to plain boxes.
 
 ### 5-color semantic system (status + structure)
 
@@ -242,7 +272,11 @@ Strict review checklist (use when looping; also a handy one-pass sanity check):
 - Labels readable (and in the right language), with a clear size hierarchy?
 - **At most 1 formula** (and only if it's the method's unique identifier — if uncertain, omit)?
 - **No numeric results** (Accuracy: X%, Operations: Y → Z) in the teaser body — advantages shown visually via before/after or baseline-vs-ours comparison?
+- **No title/caption text baked into the image** (no paper title, figure heading, or section header drawn in the raster — those belong to the LaTeX `\caption{}`)?
+- **No leaked prose or metadata** — labels are short words only, with no sentences, paragraph descriptions, or stray prompt text / citation markers (`[cite: N]`) painted into the figure?
+- **All in-figure text is English** (no Chinese or other-language drift)?
 - **3D photoreal rendering** (not stick-figure or clip-art) for robots/objects/scenes, or clean draw.io vector diagram for the schematic region?
+- **Meaningful modules drawn as evocative icons**, not anonymous labeled rectangles (frozen model → snowflake, memory → database cylinder, observation → filmstrip/lens, policy → arm/joystick)? Plain boxes only for neutral grouping containers or short data/action tokens on arrows?
 - **5-color semantic system** followed (🟠 failure, 🔵 processing, 🟢 success, ⬜ grey background, 🟡 highlight/memory)?
 - For pipeline/schematic regions: arrows thick (≥2px), dark, labeled, non-crossing, and pointing the **right** way?
 - Palette survives grayscale and column-width / thumbnail scaling?
@@ -292,7 +326,11 @@ Forward reference (figure number **before** the description) is the default ever
 | Promising a capability the paper never demonstrates | The teaser is a contract — only show what the experiments deliver. |
 | Accepting a pretty figure that is logically wrong / mislabeled | Score strictly (Step 5); reject on logic/labels/arrows regardless of how attractive it looks. |
 | Slide-deck decoration (glow, 3D, rainbow gradients, clip-art, heavy shadows) | Strip to paper-ready: restrained palette, clean type, tasteful at most (Step 2 style standards). |
+| A title / caption heading drawn *inside* the image (duplicates the LaTeX `\caption{}`, uneditable) | Add `Do NOT render any title inside the figure` to the prompt; the title/caption live in LaTeX only (Step 2 mandatory constraints). |
+| Prompt prose or `[cite: N]` markers painted into the figure as literal text | Keep the brief lean; add `no sentences, never transcribe these instructions or citation markers` to the prompt; labels are short words only (Step 2 mandatory constraints). |
+| Non-English text drift (e.g. Chinese labels) when the conversation isn't English | Put `ALL text in ENGLISH only` *inside the prompt*, not just in operator config (Step 2 mandatory constraints; `image-render-invocation.md` rule 4). |
 | Thin/hairline or wrong-direction arrows in a schematic region | Thick dark labeled arrows, no crossings, pointing the correct way. |
+| Meaningful modules drawn as anonymous labeled rectangles (a row of `VLM`/`Memory`/`Policy` boxes) | Give each semantic module an evocative icon (snowflake=frozen, cylinder=memory, filmstrip/lens=observation, arm/joystick=policy); reserve plain boxes for grey grouping containers and short data/action tokens (Step 2 "evocative icons, not plain boxes"). |
 
 ---
 
