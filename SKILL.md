@@ -52,6 +52,7 @@ Match the user's request to a row, then read ONLY the listed reference file(s). 
 | Write / narrate ablations | `references/experiments-results-playbook.md` | `references/language-phrasebank.md` |
 | Caption a figure or table | `references/figures-tables-playbook.md` | `references/experiments-results-playbook.md` (for statistical disclosure) |
 | Pick a figure type for a role | `references/figures-tables-playbook.md` (Step 1) | — |
+| Build / restyle a task gallery (F4/F5), including simulation + real robot | `references/figures-tables-playbook.md` (Step 5) | `tools/task_gallery.sim_real.yaml` when both domains appear |
 | Draw / build the teaser (raster, AI-generated) | `references/teaser-figure-playbook.md` | `references/image-render-invocation.md` (to call the renderer) |
 | Build / export an architecture, pipeline, or conceptual diagram (vector, draw.io) | `references/drawio-figure-playbook.md` | `references/figures-tables-playbook.md` (Step 3, F2 caption) |
 | Write the Conclusion | `references/closing-appendix-playbook.md` (Part 1) | `references/flow-transitions.md` (for contribution restatement) |
@@ -696,6 +697,7 @@ Step 5: Prioritize fixes
 | Venue not stated | CoRL conventions | User is writing a journal paper |
 | Tense for Method | Present (system-as-subject) | — |
 | Panel notation | `(a)(b)` lowercase | Paper is for Science (then use `(A)(B)`) |
+| Task gallery includes simulation and real-robot screenshots | Use `tools/task_gallery.sim_real.yaml`: simulation left, real robot right; horizontal task titles above frames, subfigure captions below groups (figures playbook Step 5) | Follow an explicit user layout preference |
 | Caption length | Match figure role table (F1/F2: 3–6 sentences; F5/F7: 2; F3/F4: 1) | — |
 | Bold-the-best in tables | Yes, per column | — |
 | ↑/↓ arrows in headers | Yes | — |
@@ -763,7 +765,7 @@ This skill ships executable helpers under `tools/`. They are invoked by the scen
 | `tools/page_audit.sh` | On request / submission prep | Reports CoRL-style page-budget compliance of the built PDF (`--pdf`, `--limit`). |
 | `tools/images_api_render.py` | `references/image-render-invocation.md` (teaser draw — **default renderer**) | `generate` an image via an OpenAI-compatible `images/generations` endpoint (`gpt-image-2`); `check` reports the config mode (env / codex / mixed / unavailable) before rendering; `endpoint` prints the resolved URL+auth. |
 | `tools/figure_render_helper.py` | `references/image-render-invocation.md` (teaser draw) | Renderer-agnostic `finalize` / `verify` of figure artifacts (+ a Codex-bridge `preflight` for the alternative path). |
-| `tools/task_gallery_figure.py` | On request (F4/F5 task gallery) | Build a per-task gallery figure (init + operation screenshots, grouped rows) from a YAML config — `--config` + `--workspace`. Template: `tools/task_gallery.example.yaml`. Needs matplotlib + Pillow + PyYAML. |
+| `tools/task_gallery_figure.py` | On request (F4/F5 task gallery) | Build init + operation screenshot galleries — `--config` + `--workspace`. Default sim/real preset: `tools/task_gallery.sim_real.yaml`; general options: `tools/task_gallery.example.yaml`; guidance: `references/figures-tables-playbook.md` Step 5. Needs matplotlib + Pillow + PyYAML. |
 
 ### Path resolution (applies to every bundled tool)
 

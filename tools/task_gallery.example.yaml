@@ -7,6 +7,8 @@
 #   python3 tools/task_gallery_figure.py --config task_gallery.yaml --workspace <paper-dir>
 #
 # All paths (rows[].dir, output.dir) are relative to --workspace (default: CWD).
+# For galleries containing both simulation and real-robot tasks, start from
+# task_gallery.sim_real.yaml, the preferred preset. This file documents general options.
 
 output:
   name: task_gallery          # output basename
@@ -22,11 +24,28 @@ style:
   font_names: ["Arial", "Helvetica", "DejaVu Sans"]
   label_color: "#000000"           # per-row task-label color
   label_format: "{task} ({group})" # how the row label reads; {task} and {group} are filled per row
+  task_font_size: null             # null: font_size + 1; explicit point sizes may be fractional
+  caption_font_size: null          # null: font_size - 1
+  group_font_size: null            # null: font_size + 2
+  group_label_format: "{group}"    # use "({letter}) {group}" for (a), (b), ...; {index} is 1-based
+  caption_color: "#000000"
+  panel_border_color: "#D7DCE1"
+  panel_border_width: 0            # points; 0 hides image borders, 0.3 gives a fine outline
 
 layout:
+  group_columns: 1                 # 1: stacked task rows; 2+: groups side by side with headings
+  group_gap: 0.35                  # gap between group blocks (inches in the figure canvas)
+  group_title_h: 0.3               # group-label strip height (top or bottom)
+  group_title_position: top        # top: heading; bottom: centered subfigure caption
+  task_label_position: left        # left: label column; top: horizontal title above the frames
+  task_label_h: 0.24               # title-strip height when task_label_position is top
+  row_gap: 0                       # extra vertical space between complete task rows
+  # Groups follow first appearance in rows, wrap after group_columns, and align
+  # task rows at the top even when group sizes differ. Panel sizes stay uniform.
+  # Check font readability at the final LaTeX inclusion width after adding columns.
   panel_h: 1.55                    # inches per panel (image area)
   caption_h: 0.18                  # inches reserved for the sub-caption text
-  label_w: 1.15                    # inches for the per-row task label column
+  label_w: 1.15                    # label-column width; unused when task_label_position is top
   panel_w: 1.85                    # inches per image column
   hspace: 0.05                     # vertical gap between grid rows
   wspace: 0.08                     # horizontal gap between panels
@@ -38,17 +57,19 @@ layout:
   crop: {top: 0.0, bottom: 0.0, left: 0.0, right: 0.0}
 
 captions:                          # how a filename becomes a panel sub-caption
+  separator: ""                   # optional text between adjacent captions, e.g. "→"
   init_aliases: [init, 0_init]     # stems treated as the "init" panel (also any "*_init")
   strip_numeric_prefix: true       # "0_unlock" -> "unlock"; "_"/"-" become spaces
   rename:                          # explicit label fixes (matched case-insensitively)
     "open the door": "pull door"
+    init: initial state            # renaming also applies to all recognized init aliases
 
 image_extensions: [.png, .jpg, .jpeg]
 
 # One entry per task row, in display order. Within a row, panels are ordered
 # init-first, then by the numeric filename prefix (e.g. 1_*, 2_*, ...).
 rows:
-  - group: sim                     # {group} in label_format; also visually groups rows
+  - group: sim                     # {group} in labels; group heading when group_columns > 1
     task: safe                     # {task} in label_format
     dir: raw_data/sim/images/safe  # folder of screenshots for this task
   - group: sim

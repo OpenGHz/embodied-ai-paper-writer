@@ -92,6 +92,37 @@ Task Definitions / Experimental Tasks. We illustrate {N} tasks: {task A}, {task 
 
 **To build a task-gallery figure** (per-task init + operation screenshots in grouped rows, e.g. simulator vs. real-robot), use the config-driven generator `tools/task_gallery_figure.py` (YAML config: `tools/task_gallery.example.yaml`) — it lays out one row per task, init-first then operations, with sub-captions.
 
+**Default for galleries containing both simulation and real-robot tasks**: use
+`tools/task_gallery.sim_real.yaml` unless the user specifies another layout. This
+is the skill's preferred F4/F5 presentation, rather than a venue requirement or a
+rule for quantitative plots. The preset uses:
+
+- Two columns: simulation on the left, real robot on the right.
+- Horizontal, left-aligned task names above each task's frames.
+- Initial state followed by operation frames, with labels and small arrows beneath.
+- Centered `(a) Simulation` and `(b) Real robot` captions below the complete groups.
+- Uniform image sizes, restrained sans-serif typography, fine image borders, and
+  compact spacing between tasks and between groups.
+
+Copy the preset into the paper as `task_gallery.yaml`, replace its example task
+names and image directories, and run the generator using the skill's absolute
+path (see SKILL.md, Bundled tools — Path resolution). Numerical style and layout
+defaults live in the preset. Its four tasks illustrate the schema; select rows
+from the paper's actual tasks and keep their names consistent with the prose.
+Group order follows first appearance in `rows`, so list simulation first.
+Unequal task counts align at the top; additional groups wrap across columns.
+
+The preset's crop matches the example screenshots. Check crops against the new
+sources so the object, end effector, and operation remain visible, using a
+consistent crop across each task's frames. Recheck text at the final paper width,
+especially when a task has more frames than the example. For single-domain or
+other layouts, `tools/task_gallery.example.yaml` documents the general controls;
+the renderer's fallback remains stacked rows until a preset is selected.
+
+Keep the figure caption focused on the `(a)/(b)` mapping and what each task row
+shows. When arrows already make the sequence direction clear, omit a redundant
+"read from left to right" clause; explain any non-obvious arrow semantics.
+
 ---
 
 ## Step 6 — Write qualitative rollout caption (F5) as a sequence story

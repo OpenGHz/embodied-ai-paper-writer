@@ -1,0 +1,78 @@
+# Preferred F4/F5 task-gallery preset when simulation and real robot both appear.
+# Derived from a rendered four-task paper gallery. Copy to task_gallery.yaml in
+# the paper directory and replace the example rows with the paper's actual tasks.
+# Keep simulation rows first: group order determines the left/right columns.
+#
+# Run from the paper directory, with SKILL_DIR resolved to this installed skill:
+#   python3 "$SKILL_DIR/tools/task_gallery_figure.py" \
+#       --config task_gallery.yaml --workspace .
+#
+# Image directories and output.dir are relative to --workspace. The example
+# screenshots are paper assets, not bundled with the skill. All numerical style
+# and layout settings below reproduce the approved compact sim/real arrangement.
+
+output:
+  name: task_gallery
+  dir: figures
+  formats: [pdf]
+  dpi: 300
+
+style:
+  font_size: 8
+  font_family: sans-serif
+  font_names: ["DejaVu Sans"]
+  task_font_size: 8.5
+  caption_font_size: 7.5
+  group_font_size: 9.5
+  label_color: "#252A30"
+  caption_color: "#3E454D"
+  label_format: "{task}"
+  group_label_format: "({letter}) {group}"
+  panel_border_color: "#D7DCE1"
+  panel_border_width: 0.3
+
+layout:
+  group_columns: 2
+  group_gap: 0.20
+  group_title_h: 0.36
+  group_title_position: bottom
+  task_label_position: top
+  task_label_h: 0.24
+  row_gap: 0.08
+  panel_h: 1.16                     # 5:4 frames after the example crop
+  caption_h: 0.24
+  panel_w: 1.45
+  hspace: 0
+  wspace: 0.055
+  # These crop values suit the example assets. Review and adapt them for new
+  # screenshots; each row can override crop. Keep panel_h/panel_w consistent
+  # with the resulting aspect ratio, and preserve the visible manipulation.
+  square_crop: true
+  crop: {top: 0.2}
+
+captions:
+  init_aliases: [init]
+  strip_numeric_prefix: true
+  rename: {init: initial state}
+  separator: "→"
+
+image_extensions: [.png, .jpg, .jpeg]
+
+# Example assets: replace task/dir with real paper inputs. Keep canonical task
+# spellings. More or fewer tasks per group are supported; sequences are sorted
+# init-first, then by numeric filename prefix. Review exclusion patterns for
+# the new task instead of assuming every filename containing "fail" is expendable.
+rows:
+  - group: Simulation
+    task: door
+    dir: raw_data/sim/images/door
+  - group: Simulation
+    task: microwave
+    dir: raw_data/sim/images/microwave
+  - group: Real robot
+    task: cabinet
+    dir: raw_data/real/images/cabinet
+    exclude: ["*_fail.png"]         # these example failure frames belong in a separate figure
+  - group: Real robot
+    task: bottle
+    dir: raw_data/real/images/bottle
