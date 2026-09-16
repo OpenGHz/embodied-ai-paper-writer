@@ -41,22 +41,11 @@ Each rule traces back to observed patterns in the 63-paper corpus.
 
 ### 1. Install
 
-Copy [`SKILL.md`](SKILL.md) and [`references/`](references/) into wherever your agent loads system prompts or skill files. Examples:
-
-- **Claude Code** — user-level: `~/.claude/skills/embodied-ai-paper-writer/`
-- **Claude Code** — project-level: `<your-project>/.claude/skills/embodied-ai-paper-writer/`
-- **Cursor / Continue / Cline / Aider** — paste `SKILL.md` into the custom-rules / system-prompt panel; keep `references/` next to it and attach files on demand per the routing table.
-- **Custom agent (Anthropic / OpenAI / local model SDKs)** — load `SKILL.md` as the system message; lazily read `references/*.md` based on the routing table.
-- **Plain chat** — paste `SKILL.md` into the conversation; follow up with the relevant playbook when the routing table calls for it.
-
 ```bash
-# Example: install as a user-level skill for Claude Code
-SKILL_DIR="$HOME/.claude/skills/embodied-ai-paper-writer"
-mkdir -p "$SKILL_DIR"
-cp -r SKILL.md references "$SKILL_DIR/"
+npx skills add OpenGHz/embodied-ai-paper-writer
 ```
 
-The skill is just markdown + frontmatter — nothing in the runtime behavior is locked to one vendor.
+Follow the prompts to choose your agents and installation scope.
 
 ### 2. Invoke it
 

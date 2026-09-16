@@ -41,22 +41,11 @@
 
 ### 1. 安装
 
-把 [`SKILL.md`](SKILL.md) 和 [`references/`](references/) 复制到你的 agent 加载 system prompt 或 skill 文件的位置。常见目标：
-
-- **Claude Code** —— 用户级：`~/.claude/skills/embodied-ai-paper-writer/`
-- **Claude Code** —— 项目级：`<your-project>/.claude/skills/embodied-ai-paper-writer/`
-- **Cursor / Continue / Cline / Aider** —— 把 `SKILL.md` 贴进 custom rules / system prompt 面板，`references/` 放在旁边，按 routing 表按需附加。
-- **自定义 agent（Anthropic / OpenAI / 本地模型 SDK）** —— 把 `SKILL.md` 作为 system message 加载，按 routing 表懒加载 `references/*.md`。
-- **纯聊天** —— 把 `SKILL.md` 贴进对话，按 routing 表的提示再补充对应 playbook。
-
 ```bash
-# 示例：作为用户级 skill 装到 Claude Code
-SKILL_DIR="$HOME/.claude/skills/embodied-ai-paper-writer"
-mkdir -p "$SKILL_DIR"
-cp -r SKILL.md references "$SKILL_DIR/"
+npx skills add OpenGHz/embodied-ai-paper-writer
 ```
 
-这个 skill 就是 markdown + frontmatter，运行时行为没有任何东西绑死在某一家厂商上。
+按交互提示选择 agent 和安装范围。
 
 ### 2. 唤起它
 
